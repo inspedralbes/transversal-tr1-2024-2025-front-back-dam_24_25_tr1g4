@@ -1,0 +1,14 @@
+{
+    "idUsuari": "String",
+    "productes": [
+        {
+            "idProducte": "String",
+            "quantitat": 3
+        },
+        {
+            "idProducte": "String",
+            "quantitat": 3
+        }
+    ],
+    "preuTotal": 0.0
+}

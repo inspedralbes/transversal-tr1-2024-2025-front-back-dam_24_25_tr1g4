@@ -1,0 +1,31 @@
+
+[
+    {
+        "id": 0,
+        "nom": "",
+        "imatge": "",
+        "estoc": 0,
+        "preu": 0.0
+    },
+    {
+        "id": 1,
+        "nom": "",
+        "imatge": "",
+        "estoc": 0,
+        "preu": 0.0
+    },
+    {
+        "id": 2,
+        "nom": "",
+        "imatge": "",
+        "estoc": 0,
+        "preu": 0.0
+    },
+    {
+        "id": 3,
+        "nom": "",
+        "imatge": "",
+        "estoc": 0,
+        "preu": 0.0
+    }
+]

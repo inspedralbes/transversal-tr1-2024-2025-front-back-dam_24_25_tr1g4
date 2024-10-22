@@ -1,0 +1,28 @@
+{
+    "productes": [
+        {
+            "id": 0,
+            "nom": "",
+            "imatge": "",
+            "estoc": 0,
+            "preu": 0.0,
+            "activat": false
+        },
+        {
+            "id": 1,
+            "nom": "",
+            "imatge": "",
+            "estoc": 0,
+            "preu": 0.0,
+            "activat": false
+        },
+        {
+            "id": 2,
+            "nom": "",
+            "imatge": "",
+            "estoc": 0,
+            "preu": 0.0,
+            "activat": false
+        }
+    ]
+}
