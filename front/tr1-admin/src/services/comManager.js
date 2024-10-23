@@ -1,6 +1,6 @@
 // src/services/CommunicationManager.js
 
-const URL = 'comandas.json'; 
+const URL = 'services/comandas.json'; 
 
 export default {
   async getComandas() {
