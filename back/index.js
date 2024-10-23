@@ -43,7 +43,7 @@ app.get('/producte', async (req, res) => {
         console.log("esta ejecutandose el try")
         const connection = await connectionPromise;
         console.log("se ha conectado a la bbdd")
-        const [rows] = await connection.execute('SELECT * FROM PRODUCTE');
+        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge, ACTIVAT as activat FROM `producte`');
         console.log("se ha ejecutado el select")
         res.json(rows);
     } catch (error) {
