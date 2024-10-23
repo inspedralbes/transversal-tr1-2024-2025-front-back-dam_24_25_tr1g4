@@ -1,4 +1,5 @@
 <template>
+  <PantallaComanda />
 
 </template>
 

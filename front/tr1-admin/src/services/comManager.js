@@ -1,15 +1,17 @@
 // src/services/CommunicationManager.js
 
-const URL = process.env.VUE_APP_API_ROUTE; 
+const URL = import.meta.env.VITE_API_ROUTE; 
 
 export default {
   async getComandas() {
     try {
-      const response = await fetch(URL);
+      const response = await fetch(`${URL}/producte`);
       if (!response.ok) {
         throw new Error(`Error en la solicitud: ${response.status}`);
       }
       const data = await response.json();
+      console.log(data);
+      
       return data;
     } catch (error) {
       console.error('Error en Communication Manager:', error);

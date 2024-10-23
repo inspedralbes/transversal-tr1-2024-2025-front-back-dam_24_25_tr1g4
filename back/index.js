@@ -2,6 +2,7 @@ import express from 'express';
 import mysql from 'mysql2/promise';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 
 dotenv.config();
@@ -9,6 +10,7 @@ const app = express();
 const port = 3001;
 
 
+app.use(cors())
 app.use(bodyParser.json());
 
 const dbConfig = {
