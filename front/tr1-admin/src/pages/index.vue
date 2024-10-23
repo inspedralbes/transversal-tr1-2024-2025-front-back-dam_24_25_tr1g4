@@ -1,7 +1,14 @@
+<script setup>
+import { onBeforeMount, reactive, ref } from 'vue';
+const productes = ref([]);
+
+
+</script>
+
 <template>
-  <HelloWorld />
+
 </template>
 
-<script setup>
-  //
-</script>
+<style scoped>
+
+</style>
