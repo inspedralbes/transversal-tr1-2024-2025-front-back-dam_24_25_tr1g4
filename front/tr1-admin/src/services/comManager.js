@@ -1,6 +1,6 @@
 // src/services/CommunicationManager.js
 
-const URL = 'services/comandas.json'; 
+const URL = process.env.VUE_APP_API_ROUTE; 
 
 export default {
   async getComandas() {
