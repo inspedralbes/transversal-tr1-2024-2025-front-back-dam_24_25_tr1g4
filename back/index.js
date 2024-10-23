@@ -1,5 +1,6 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
+import bodyParser from 'body-parser';
 
 
 const app = express();
@@ -10,12 +11,12 @@ app.use(bodyParser.json());
 
 
 const dbConfig = {
-    host: 'localhost',
+    host: 'localhost', 
+    port: 3306,        
     user: 'root',
-    password: 'password',
-    database: 'testdb'
+    password: '',
+    database: 'tr1_wired'
 };
-
 
 async function connectToDatabase() {
     try {
@@ -31,68 +32,84 @@ async function connectToDatabase() {
 
 const connectionPromise = connectToDatabase();
 
+//PRODUCTES
 
-app.get('/items', async (req, res) => {
+//FUNCIONA
+app.get('/producte', async (req, res) => {
     try {
+        console.log("esta ejecutandose el try")
         const connection = await connectionPromise;
-        const [rows] = await connection.execute('SELECT * FROM items');
+        console.log("se ha conectado a la bbdd")
+        const [rows] = await connection.execute('SELECT * FROM PRODUCTE');
+        console.log("se ha ejecutado el select")
         res.json(rows);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch items' });
+        res.status(500).json({ error: 'Failed to fetch PRODUCTE' });
     }
 });
 
 
+//FUNCIONA
+app.get('/producteAndroidApp', async (req, res) => {
+    try {
+        console.log("esta ejecutandose el try")
+        const connection = await connectionPromise;
+        console.log("se ha conectado a la bbdd")
+        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge FROM `producte` WHERE ACTIVAT = 1;');
+        console.log("se ha ejecutado el select")
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch PRODUCTE' });
+    }
+});
 
 
-//productes
-app.post('/items', async (req, res) => {
+app.post('/producte', async (req, res) => {
     try {
         const connection = await connectionPromise;
-        const { name, value } = req.body;
-        const [result] = await connection.execute('INSERT INTO items (name, value) VALUES (?, ?)', [name, value]);
-        res.json({ id: result.insertId, name, value });
+        const { nom, preu, estoc, activat, img } = req.body;
+        const [result] = await connection.execute('INSERT INTO PRODUCTE (nom, preu, estoc, activat, img) VALUES (?, ?, ?, ?, ?, ?)', [nom, preu, estoc, activat, img]);
+        res.json({ id: result.insertId, nom, preu, estoc, activat, img });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create item' });
+        res.status(500).json({ error: 'Failed to create PRODUCTE' });
     }
 });
 
 
-app.put('/items/:id', async (req, res) => {
+app.put('/producte/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
         const { id } = req.params;
         const { name, value } = req.body;
-        await connection.execute('UPDATE items SET name = ?, value = ? WHERE id = ?', [name, value, id]);
+        await connection.execute('UPDATE PRODUCTE SET name = ?, value = ? WHERE id = ?', [name, value, id]);
         res.json({ id, name, value });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update item' });
+        res.status(500).json({ error: 'Failed to update PRODUCTE' });
     }
 });
 
 
-app.delete('/items/:id', async (req, res) => {
+app.delete('/producte/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
         const { id } = req.params;
-        await connection.execute('DELETE FROM items WHERE id = ?', [id]);
+        await connection.execute('DELETE FROM PRODUCTE WHERE id = ?', [id]);
         res.json({ id });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to delete item' });
+        res.status(500).json({ error: 'Failed to delete PRODUCTE' });
     }
 });
 
 
 
-
-//comandas
+//CODANDA
 app.get('/comanda', async (req, res) => {
     try {
         const connection = await connectionPromise;
-        const [rows] = await connection.execute('SELECT * FROM comanda');
+        const [rows] = await connection.execute('SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;');
         res.json(rows);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch items' });
+        res.status(500).json({ error: 'Failed to fetch comanda' });
     }
 });
 
