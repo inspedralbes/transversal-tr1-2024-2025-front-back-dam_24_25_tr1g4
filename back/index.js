@@ -2,8 +2,6 @@ import express from 'express';
 import mysql from 'mysql2/promise';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-
-
 dotenv.config();
 const app = express();
 const port = 3000;
@@ -64,28 +62,33 @@ app.get('/producteAndroidApp', async (req, res) => {
     }
 });
 
-
+//FUNCIONA
 app.post('/producte', async (req, res) => {
     try {
         const connection = await connectionPromise;
-        const { nom, preu, estoc, activat, img } = req.body;
-        const [result] = await connection.execute('INSERT INTO PRODUCTE (nom, preu, estoc, activat, img) VALUES (?, ?, ?, ?, ?, ?)', [nom, preu, estoc, activat, img]);
-        res.json({ id: result.insertId, nom, preu, estoc, activat, img });
+        const {nom, preu, estoc, img, activat} = req.body;
+        console.log("se ha ejecutado la conexión");
+        const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);
+        res.json({ id: result.insertId, nom, preu, estoc, img, activat});
+        console.log("se ha hecho el insert correctamente ");
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create PRODUCTE' });
+        res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
     }
 });
 
-
+//COMPORBANDO
 app.put('/producte/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
+        console.log("conexion establecida");
         const { id } = req.params;
-        const { name, value } = req.body;
-        await connection.execute('UPDATE PRODUCTE SET name = ?, value = ? WHERE id = ?', [name, value, id]);
-        res.json({ id, name, value });
+        console.log(req.params);
+        const { nom, preu, estoc, img, activat} = req.body;
+        console.log(req.body);
+        await connection.execute('UPDATE PRODUCTE SET (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat, id]);
+        res.json({ id, nom, preu, estoc, img, activat });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update PRODUCTE' });
+        res.status(500).json({ error: `Failed to update PRODUCTE  ${error}`});
     }
 });
 
