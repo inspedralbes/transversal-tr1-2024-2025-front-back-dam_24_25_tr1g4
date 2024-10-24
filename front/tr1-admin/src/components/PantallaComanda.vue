@@ -22,7 +22,7 @@
                       Id {{ comanda.id }}
                     </v-list-item-title>
                     <v-list-item-title>
-                      IdUser {{ comanda.idUser }}
+                      IdUser {{ comanda.iduser }}
                     </v-list-item-title>
                     <v-list-item-title>
                       Preu total {{ comanda.preu_total }}
