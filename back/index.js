@@ -21,6 +21,8 @@ const dbConfig = {
     database: process.env.DB_NAME
 };
 
+app.use('/assets', express.static('public'))
+
 async function connectToDatabase() {
     try {
         const connection = await mysql.createConnection(dbConfig);

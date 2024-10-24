@@ -1,0 +1,1 @@
+Aquí es guarden les fotos que es pugin
