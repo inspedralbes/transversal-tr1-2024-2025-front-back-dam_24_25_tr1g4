@@ -34,44 +34,53 @@ async function connectToDatabase() {
     }
 }
 
-
-const connectionPromise = connectToDatabase();
-
 // CRUD PRODUCTES
 
-// READ VUE
+// GET VUE
 app.get('/producte', async (req, res) => {
+    let connection;
     try {
         console.log("esta ejecutandose el try")
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         console.log("se ha conectado a la bbdd")
         const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge, ACTIVAT as activat FROM `producte`');
         console.log("se ha ejecutado el select")
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch PRODUCTE' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
-// READ ANDROID
+// GET ANDROID
 app.get('/producteAndroidApp', async (req, res) => {
+    let connection;
     try {
         console.log("esta ejecutandose el try")
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         console.log("se ha conectado a la bbdd")
         const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge FROM `producte` WHERE ACTIVAT = 1;');
         console.log("se ha ejecutado el select")
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch PRODUCTE' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
 // CREATE
 app.post('/producte', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         const {nom, preu, estoc, img, activat} = req.body;
         console.log("se ha ejecutado la conexión");
         const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);
@@ -79,14 +88,19 @@ app.post('/producte', async (req, res) => {
         console.log("se ha hecho el insert correctamente ");
     } catch (error) {
         res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
 // UPDATE
 app.put('/producte/:id', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         console.log("conexion establecida");
         const { id } = req.params;
         console.log(req.params);
@@ -100,41 +114,56 @@ app.put('/producte/:id', async (req, res) => {
         res.json({ id, nom, preu, estoc, img, activat });
     } catch (error) {
         res.status(500).json({ error: `Failed to update PRODUCTE  ${error}`});
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
 // DELETE
 app.delete('/producte/:id', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         const { id } = req.params;
         await connection.execute('DELETE FROM PRODUCTE WHERE id = ?', [id]);
         res.json({ id });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete PRODUCTE' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
-
-
 
 // CRUD COMANDA
 
 // READ
 app.get('/comanda', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         const [rows] = await connection.execute('SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;');
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch comanda' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
 // CREATE
 app.post('/comanda', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         console.log("conexion realizada");
         const {idUser, productes, estat, preu_total } = req.body;
         const [result] = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
@@ -143,13 +172,19 @@ app.post('/comanda', async (req, res) => {
         res.json({ id: result.insertId, idUser, productes, estat, preu_total});
     } catch (error) {
         res.status(500).json({ error: `Failed to create comanda ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
 // UPDATE
 app.put('/comanda/:id', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         console.log("conexion para actualizar comanda realizada correctamente");
         const { id } = req.params;
         console.log(req.params);
@@ -159,21 +194,31 @@ app.put('/comanda/:id', async (req, res) => {
         res.json({ id, idUser, productes, estat, preu_total});
     } catch (error) {
         res.status(500).json({ error: `Failed to update item ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
 // DELETE
 app.delete('/comanda/:id', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         const { id } = req.params;
         await connection.execute('DELETE FROM comanda WHERE id = ?', [id]);
         res.json({ id });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete item' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
-
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
