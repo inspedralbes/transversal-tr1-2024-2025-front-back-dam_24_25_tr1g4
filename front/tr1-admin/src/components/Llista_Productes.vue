@@ -5,7 +5,7 @@ const productes = ref([]);
 
 async function fetchGetProductes() {
   try {
-    productes = await getProductes();
+    productes.value = await getProductes();
   }
   catch (error) {
     console.error('Error al obtener preguntas', error);
@@ -18,8 +18,13 @@ onBeforeMount(() => {
 
 <template>
   <div>
-    <ul v-for="producte in productes.data">
+    <h1>Productes</h1>
+    <ul v-for="producte in productes">
       <li>{{ producte.id }}</li>
+      <li><img :src="producte.imatge" alt="Imagen del producto"></li>
+      <li>{{ producte.nom }}</li>
+      <li>{{ producte.preu }}</li>
+      <li>{{ producte.estoc }}</li>
     </ul>
   </div>
 </template>
