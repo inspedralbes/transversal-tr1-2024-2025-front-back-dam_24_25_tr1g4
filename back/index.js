@@ -37,9 +37,9 @@ async function connectToDatabase() {
 
 const connectionPromise = connectToDatabase();
 
-//PRODUCTES
+// CRUD PRODUCTES
 
-//FUNCIONA
+// READ VUE
 app.get('/producte', async (req, res) => {
     try {
         console.log("esta ejecutandose el try")
@@ -54,7 +54,7 @@ app.get('/producte', async (req, res) => {
 });
 
 
-//FUNCIONA
+// READ ANDROID
 app.get('/producteAndroidApp', async (req, res) => {
     try {
         console.log("esta ejecutandose el try")
@@ -68,7 +68,7 @@ app.get('/producteAndroidApp', async (req, res) => {
     }
 });
 
-//FUNCIONA
+// CREATE
 app.post('/producte', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -83,7 +83,7 @@ app.post('/producte', async (req, res) => {
 });
 
 
-//FUNCIONA
+// UPDATE
 app.put('/producte/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -103,7 +103,7 @@ app.put('/producte/:id', async (req, res) => {
     }
 });
 
-//FUNCIONA
+// DELETE
 app.delete('/producte/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -117,9 +117,9 @@ app.delete('/producte/:id', async (req, res) => {
 
 
 
-//CODANDA
+// CRUD COMANDA
 
-//FUNCIONA
+// READ
 app.get('/comanda', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -131,7 +131,7 @@ app.get('/comanda', async (req, res) => {
 });
 
 
-//FUNCIONA
+// CREATE
 app.post('/comanda', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -146,7 +146,7 @@ app.post('/comanda', async (req, res) => {
     }
 });
 
-//FUNCIONA
+// UPDATE
 app.put('/comanda/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -162,7 +162,7 @@ app.put('/comanda/:id', async (req, res) => {
     }
 });
 
-//FUNCIONA
+// DELETE
 app.delete('/comanda/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
