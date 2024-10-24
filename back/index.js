@@ -76,7 +76,8 @@ app.post('/producte', async (req, res) => {
     }
 });
 
-//COMPORBANDO
+
+//FUNCIONA
 app.put('/producte/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -85,14 +86,18 @@ app.put('/producte/:id', async (req, res) => {
         console.log(req.params);
         const { nom, preu, estoc, img, activat} = req.body;
         console.log(req.body);
-        await connection.execute('UPDATE PRODUCTE SET (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat, id]);
+        await connection.execute(
+            'UPDATE PRODUCTE SET nom = ?, preu = ?, estoc = ?, img = ?, activat = ? WHERE id = ?', 
+            [nom, preu, estoc, img, activat, id]
+        );
+        console.log("se hace el update en la bbdd");
         res.json({ id, nom, preu, estoc, img, activat });
     } catch (error) {
         res.status(500).json({ error: `Failed to update PRODUCTE  ${error}`});
     }
 });
 
-
+//FUNCIONA
 app.delete('/producte/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -107,6 +112,8 @@ app.delete('/producte/:id', async (req, res) => {
 
 
 //CODANDA
+
+//FUNCIONA
 app.get('/comanda', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -118,31 +125,38 @@ app.get('/comanda', async (req, res) => {
 });
 
 
+//FUNCIONA
 app.post('/comanda', async (req, res) => {
     try {
         const connection = await connectionPromise;
-        const {idUser, productes, estat } = req.body;
-        const [result] = await connection.execute('INSERT INTO comanda (idUser, productes, estat) VALUES (?, ?)', [idUser, productes, estat]);
-        res.json({ id: result.insertId, idUser, productes, estat});
+        console.log("conexion realizada");
+        const {idUser, productes, estat, preu_total } = req.body;
+        const [result] = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
+        console.log("insert realizado correctamente en la bbdd");
+        console.log(req.body);
+        res.json({ id: result.insertId, idUser, productes, estat, preu_total});
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create item' });
+        res.status(500).json({ error: `Failed to create comanda ${error}` });
     }
 });
 
-
+//FUNCIONA
 app.put('/comanda/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
+        console.log("conexion para actualizar comanda realizada correctamente");
         const { id } = req.params;
-        const {idUser, productes, estat } = req.body;
-        await connection.execute('UPDATE comanda SET name = ?, value = ? WHERE id = ?', [idUser, productes, estat]);
-        res.json({ id, idUser, productes, estat});
+        console.log(req.params);
+        const {idUser, productes, estat, preu_total } = req.body;
+        console.log(req.body);
+        await connection.execute('UPDATE comanda SET idUser = ?, productes = ?, estat = ?, preu_total = ?', [idUser, productes, estat, preu_total]);
+        res.json({ id, idUser, productes, estat, preu_total});
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update item' });
+        res.status(500).json({ error: `Failed to update item ${error}` });
     }
 });
 
-
+//FUNCIONA
 app.delete('/comanda/:id', async (req, res) => {
     try {
         const connection = await connectionPromise;
@@ -153,8 +167,6 @@ app.delete('/comanda/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete item' });
     }
 });
-
-
 
 
 app.listen(port, () => {
