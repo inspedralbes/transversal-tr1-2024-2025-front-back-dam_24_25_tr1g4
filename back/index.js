@@ -3,7 +3,7 @@ import mysql from 'mysql2/promise';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
-
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 const app = express();
@@ -60,7 +60,6 @@ app.get('/producte', async (req, res) => {
 app.get('/producteAndroidApp', async (req, res) => {
     let connection;
     try {
-        console.log("esta ejecutandose el try")
         connection = await connectToDatabase();
         console.log("se ha conectado a la bbdd")
         const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge FROM `producte` WHERE ACTIVAT = 1;');
@@ -159,6 +158,34 @@ app.get('/comanda', async (req, res) => {
     }
 });
 
+//acabada
+app.get('/comandaAndroid', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        const [rows] = await connection.execute('SELECT ID as id, ESTAT as estatus, PREU_TOTAL as total, PRODUCTES as produtos FROM comanda;');
+
+        res.json({
+            valid: true,
+            data: rows
+        });
+    } catch (error) {
+    
+        res.status(500).json({
+            valid: false,
+            error: 'Failed to fetch comanda'
+        });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
+
+
+
+
 // CREATE
 app.post('/comanda', async (req, res) => {
     let connection;
@@ -170,6 +197,26 @@ app.post('/comanda', async (req, res) => {
         console.log("insert realizado correctamente en la bbdd");
         console.log(req.body);
         res.json({ id: result.insertId, idUser, productes, estat, preu_total});
+    } catch (error) {
+        res.status(500).json({ error: `Failed to create comanda ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
+
+app.post('/comandaAndorid', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        console.log("conexion realizada");
+        const {idProducte, quantitat, preu} = req.body;
+        const [result] = await connection.execute('INSERT INTO comanda (idProduct, quantitat, preu) VALUES (?, ?, ?)', [idProducte, quantitat, preu]);
+        console.log("insert realizado correctamente en la bbdd");
+        console.log(req.body);
+        res.json({ id: result.insertId, idProducte, quantitat, preu});
     } catch (error) {
         res.status(500).json({ error: `Failed to create comanda ${error}` });
     } finally {
@@ -211,7 +258,78 @@ app.delete('/comanda/:id', async (req, res) => {
         await connection.execute('DELETE FROM comanda WHERE id = ?', [id]);
         res.json({ id });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to delete item' });
+        res.status(500).json({ error: `Failed to delete item ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
+
+
+
+// CRUD USERS
+// READ FUNCIONA
+app.get('/users', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        const [rows] = await connection.execute('SELECT ID as idUsuari, NAME as nom, CORREO as correu, PAGAMENT as forma_pagament FROM usuari;');
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: `Failed to fetch USUARIS ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
+
+// CREATE
+app.post('/users', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        console.log("Conexión realizada");
+
+        const { name, password, pagament, correo } = req.body;
+
+        if (!name || !password || !pagament || !correo) {
+            return res.status(400).json({ error: `Todos los campos son obligatorios` });
+        }
+        console.log("datos antes de hashear la contraseña: " , req.body);
+        const hashedPassword = await bcrypt.hash(password, 10); 
+        
+        const [result] = await connection.execute(
+            'INSERT INTO usuari (name, password, pagament, correo) VALUES (?, ?, ?, ?)',
+            [name, hashedPassword, pagament, correo]
+        );
+
+        console.log("Inserción realizada correctamente en la base de datos");
+
+        res.json({ id: result.insertId, name, pagament, correo }); 
+    } catch (error) {
+        res.status(500).json({ error: `Fallo al crear usuario: ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Conexión a la base de datos cerrada.');
+        }
+    }
+});
+
+app.get('/login/idUser', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        const { idUser }= req.params
+        const { correo, password} = req.body
+        const [rows] = await connection.execute('SELECT CORREO as correu, PASSWORD as contrasenya FROM usuari where ID = ?;', [ correo, password, idUser ]);
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: `Failed to fetch USUARIS ${error}` });
     } finally {
         if (connection) {
             await connection.end();
