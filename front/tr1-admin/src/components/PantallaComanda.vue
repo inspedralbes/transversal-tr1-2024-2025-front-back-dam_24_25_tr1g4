@@ -82,7 +82,7 @@
 </template>
 <script>
 import { ref, onMounted } from "vue";
-import CommunicationManager from "@/services/communicationManager";
+import { getComandas } from "@/services/communicationManager";
 
 export default {
   setup() {
@@ -92,7 +92,7 @@ export default {
 
     const fetchComandas = async () => {
       try {
-        const data = await CommunicationManager.getComandas();
+        const data = await getComandas();
         comandas.value = data;
       } catch (error) {
         console.error("Error al obtener las comandas:", error);
@@ -107,12 +107,9 @@ export default {
     const saveEdit = async () => {
       try {
         const updatedComanda = {
-          idUser: editableComanda.value.idUser,
-          productes: editableComanda.value.productes,
           estat: editableComanda.value.estat,
-          preu_total: editableComanda.value.preu_total,
         };
-        await CommunicationManager.updateComanda(editableComanda.value.id, updatedComanda);
+        await updateComanda(editableComanda.value.id, updatedComanda);
         const index = comandas.value.findIndex((c) => c.id === editableComanda.value.id);
         comandas.value[index] = { ...editableComanda.value };
         dialog.value = false;
@@ -135,7 +132,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .container-tabla {
