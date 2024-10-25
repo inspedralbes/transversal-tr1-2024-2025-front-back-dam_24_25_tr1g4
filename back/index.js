@@ -9,7 +9,6 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT;
 
-app.use(cors());
 
 app.use(cors())
 app.use(bodyParser.json());
@@ -22,6 +21,8 @@ const dbConfig = {
     database: process.env.DB_NAME
 };
 
+app.use('/assets', express.static('public'))
+
 async function connectToDatabase() {
     try {
         const connection = await mysql.createConnection(dbConfig);
@@ -33,129 +34,191 @@ async function connectToDatabase() {
     }
 }
 
+// CRUD PRODUCTES
 
-const connectionPromise = connectToDatabase();
-
-//PRODUCTES
-
-//FUNCIONA
+// GET VUE
 app.get('/producte', async (req, res) => {
+    let connection;
     try {
         console.log("esta ejecutandose el try")
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         console.log("se ha conectado a la bbdd")
-        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge, ACTIVAT as activat FROM `producte`');
+        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, ROUND(PREU, 2) as preu, ESTOC as estoc, IMG as imatge, ACTIVAT as activat FROM `producte`');
         console.log("se ha ejecutado el select")
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch PRODUCTE' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
-//FUNCIONA
+// GET ANDROID
 app.get('/producteAndroidApp', async (req, res) => {
+    let connection;
     try {
         console.log("esta ejecutandose el try")
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         console.log("se ha conectado a la bbdd")
-        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge FROM `producte` WHERE ACTIVAT = 1;');
+        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, ROUND(PREU, 2) as preu, ESTOC as estoc, IMG as imatge FROM `producte` WHERE ACTIVAT = 1;');
         console.log("se ha ejecutado el select")
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch PRODUCTE' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
+// CREATE
 app.post('/producte', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
-        const { nom, preu, estoc, activat, img } = req.body;
-        const [result] = await connection.execute('INSERT INTO PRODUCTE (nom, preu, estoc, activat, img) VALUES (?, ?, ?, ?, ?, ?)', [nom, preu, estoc, activat, img]);
-        res.json({ id: result.insertId, nom, preu, estoc, activat, img });
+        connection = await connectToDatabase();
+        const {nom, preu, estoc, img, activat} = req.body;
+        console.log("se ha ejecutado la conexión");
+        const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);
+        res.json({ id: result.insertId, nom, preu, estoc, img, activat});
+        console.log("se ha hecho el insert correctamente ");
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create PRODUCTE' });
+        res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
+// UPDATE
 app.put('/producte/:id', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
+        console.log("conexion establecida");
         const { id } = req.params;
-        const { name, value } = req.body;
-        await connection.execute('UPDATE PRODUCTE SET name = ?, value = ? WHERE id = ?', [name, value, id]);
-        res.json({ id, name, value });
+        console.log(req.params);
+        const { nom, preu, estoc, img, activat} = req.body;
+        console.log(req.body);
+        await connection.execute(
+            'UPDATE PRODUCTE SET nom = ?, preu = ?, estoc = ?, img = ?, activat = ? WHERE id = ?', 
+            [nom, preu, estoc, img, activat, id]
+        );
+        console.log("se hace el update en la bbdd");
+        res.json({ id, nom, preu, estoc, img, activat });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update PRODUCTE' });
+        res.status(500).json({ error: `Failed to update PRODUCTE  ${error}`});
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
+// DELETE
 app.delete('/producte/:id', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         const { id } = req.params;
         await connection.execute('DELETE FROM PRODUCTE WHERE id = ?', [id]);
         res.json({ id });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete PRODUCTE' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
+// CRUD COMANDA
 
-
-//CODANDA
+// READ
 app.get('/comanda', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         const [rows] = await connection.execute('SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;');
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch comanda' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
+// CREATE
 app.post('/comanda', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
-        const {idUser, productes, estat } = req.body;
-        const [result] = await connection.execute('INSERT INTO comanda (idUser, productes, estat) VALUES (?, ?)', [idUser, productes, estat]);
-        res.json({ id: result.insertId, idUser, productes, estat});
+        connection = await connectToDatabase();
+        console.log("conexion realizada");
+        const {idUser, productes, estat, preu_total } = req.body;
+        const [result] = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
+        console.log("insert realizado correctamente en la bbdd");
+        console.log(req.body);
+        res.json({ id: result.insertId, idUser, productes, estat, preu_total});
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create item' });
+        res.status(500).json({ error: `Failed to create comanda ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
+// UPDATE
 app.put('/comanda/:id', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
+        console.log("conexion para actualizar comanda realizada correctamente");
         const { id } = req.params;
-        const {idUser, productes, estat } = req.body;
-        await connection.execute('UPDATE comanda SET name = ?, value = ? WHERE id = ?', [idUser, productes, estat]);
-        res.json({ id, idUser, productes, estat});
+        console.log(req.params);
+        const {idUser, productes, estat, preu_total } = req.body;
+        console.log(req.body);
+        await connection.execute('UPDATE comanda SET idUser = ?, productes = ?, estat = ?, preu_total = ?', [idUser, productes, estat, preu_total]);
+        res.json({ id, idUser, productes, estat, preu_total});
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update item' });
+        res.status(500).json({ error: `Failed to update item ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
 
-
+// DELETE
 app.delete('/comanda/:id', async (req, res) => {
+    let connection;
     try {
-        const connection = await connectionPromise;
+        connection = await connectToDatabase();
         const { id } = req.params;
         await connection.execute('DELETE FROM comanda WHERE id = ?', [id]);
         res.json({ id });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete item' });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
     }
 });
-
-
-
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
