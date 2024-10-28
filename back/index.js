@@ -372,7 +372,8 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Contraseña incorrecta' });
         }
         else if (passwordMatch){
-            const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL 
+            const token = "2";
             return res.status(200).json({ message: 'Login exitoso', userId: usuari.id, token });
         }
     } catch (error) {
