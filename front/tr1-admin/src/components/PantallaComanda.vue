@@ -29,66 +29,37 @@
                 <div class="tabla_item">{{ comanda.estat }}</div>
                 <div class="tabla_item">{{ comanda.iduser }}</div>
                 <div class="tabla_item">{{ comanda.preu_total }}</div>
-                <!-- <div class="tabla_item">{{ comanda.productes }}</div> -->
                 <div class="tabla_item">
-                  <v-dialog v-model="dialog" max-width="500">
-                    <template v-slot:activator="{ props: activatorProps }">
-                      <v-btn
-                        v-bind="activatorProps"
-                        color="surface-variant"
-                        text="Editar"
-                        variant="flat"
-                        @click="openEditDialog(comanda)"
-                      ></v-btn>
-                    </template>
-
-                    <template v-slot:default>
-                      <v-card title="Edició de comanda">
-                        <v-card-text>
-                          <v-text-field
-                            label="ID User"
-                            v-model="editableComanda.idUser"
-                          ></v-text-field>
-                          <v-text-field
-                            label="Estat"
-                            v-model="editableComanda.estat"
-                          ></v-text-field>
-                          <v-text-field
-                            label="Preu Total"
-                            v-model="editableComanda.preu_total"
-                            type="number"
-                          ></v-text-field>
-                          <v-textarea
-                            label="Productes"
-                            v-model="editableComanda.productes"
-                          ></v-textarea>
-                        </v-card-text>
-                       <v-card-actions>
-                          <v-spacer></v-spacer>
-                          <v-btn text="Cancel" @click="dialog = false"></v-btn>
-                          <v-btn color="primary" text="Save" @click="saveEdit"></v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </template>
-                  </v-dialog>
+                  <v-btn color="surface-variant" text @click="Edicio(comanda)">Editar</v-btn>
                 </div>
               </div>
             </div>
+            <EdicioComanda
+              v-model="dialog"
+              :comanda="comandaSeleccionada"
+              @cerrar="cerrarDialogo"
+              @guardar="guardarCambios"
+            />
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
 <script>
 import { ref, onMounted } from "vue";
 import { getComandas } from "@/services/communicationManager";
+import EdicioComanda from "@/components/EdicioComanda.vue";
 
 export default {
+  components: {
+    EdicioComanda,
+  },
   setup() {
     const comandas = ref([]);
-    const dialog = ref(false); 
-    const editableComanda = ref({}); 
+    const dialog = ref(false);
+    const comandaSeleccionada = ref(null);
 
     const fetchComandas = async () => {
       try {
@@ -99,35 +70,35 @@ export default {
       }
     };
 
-    const openEditDialog = (comanda) => {
-      editableComanda.value = { ...comanda }; 
-      dialog.value = true;
+    const Edicio = (comanda) => {
+      comandaSeleccionada.value = comanda;
+      dialog.value = true; 
     };
 
-    const saveEdit = async () => {
-      try {
-        const updatedComanda = {
-          estat: editableComanda.value.estat,
-        };
-        await updateComanda(editableComanda.value.id, updatedComanda);
-        const index = comandas.value.findIndex((c) => c.id === editableComanda.value.id);
-        comandas.value[index] = { ...editableComanda.value };
-        dialog.value = false;
-      } catch (error) {
-        console.error("Error al actualizar la comanda:", error);
+    const cerrarDialogo = () => {
+      dialog.value = false; 
+      comandaSeleccionada.value = null; 
+    };
+
+    const guardarCambios = (updatedComanda) => {
+      const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
+      if (index !== -1) {
+        comandas.value[index].estat = updatedComanda.estat;
       }
+      cerrarDialogo(); 
     };
 
     onMounted(() => {
-      fetchComandas();
+      fetchComandas(); 
     });
 
     return {
       comandas,
       dialog,
-      editableComanda,
-      openEditDialog,
-      saveEdit,
+      comandaSeleccionada,
+      Edicio,
+      cerrarDialogo,
+      guardarCambios,
     };
   },
 };
@@ -143,7 +114,7 @@ export default {
 
   display: grid;
   grid-template-columns: 20% 20% 30% 15%;
-  grid-auto-rows: 50px;
+  grid-auto-rows: 50px;           
 }
 .tabla_row {
   display: contents;
@@ -170,10 +141,7 @@ export default {
   font-weight: bold;
   font-size: 1.5em;
 }
-.tabla_apartados {
-  font-weight: bold;
-  font-size: 1.5em;
-}
+
 .tabla_item {
   padding: 10px 5px;
   font-size: 1.2em;
@@ -184,7 +152,5 @@ export default {
   top: 10px;
   left: 10px;
 }
-.text-h5 {
-  font-weight: bold;
-}
+
 </style>

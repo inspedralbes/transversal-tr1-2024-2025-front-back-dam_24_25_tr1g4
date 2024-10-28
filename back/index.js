@@ -188,10 +188,10 @@ app.put('/comanda/:id', async (req, res) => {
         console.log("conexion para actualizar comanda realizada correctamente");
         const { id } = req.params;
         console.log(req.params);
-        const {idUser, productes, estat, preu_total } = req.body;
+        const { estat } = req.body;
         console.log(req.body);
-        await connection.execute('UPDATE comanda SET idUser = ?, productes = ?, estat = ?, preu_total = ?', [idUser, productes, estat, preu_total]);
-        res.json({ id, idUser, productes, estat, preu_total});
+        await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
+        res.json({ id, estat,});
     } catch (error) {
         res.status(500).json({ error: `Failed to update item ${error}` });
     } finally {
