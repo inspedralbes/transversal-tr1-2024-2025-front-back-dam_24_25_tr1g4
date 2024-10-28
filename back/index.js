@@ -5,18 +5,21 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+const http = require('http');
+const { Server } = require('socket.io');
 
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
+const server = http.createServer(app);
+const io = new Server(server); // Integrar Socket.IO con el servidor HT
 
 
 app.use(cors())
 app.use(bodyParser.json());
 
 const salt = bcrypt.genSaltSync(10);
-
 
 const dbConfig = {
     host: process.env.DB_HOST,
