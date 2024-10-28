@@ -45,7 +45,7 @@ app.get('/producte', async (req, res) => {
         console.log("esta ejecutandose el try")
         connection = await connectToDatabase();
         console.log("se ha conectado a la bbdd")
-        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge, ACTIVAT as activat FROM `producte`');
+        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, ROUND(PREU, 2) as preu, ESTOC as estoc, IMG as imatge, ACTIVAT as activat FROM `producte`');
         console.log("se ha ejecutado el select")
         res.json(rows);
     } catch (error) {
@@ -64,7 +64,7 @@ app.get('/producteAndroidApp', async (req, res) => {
     try {
         connection = await connectToDatabase();
         console.log("se ha conectado a la bbdd")
-        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, PREU as preu, ESTOC as estoc, IMG as imatge FROM `producte` WHERE ACTIVAT = 1;');
+        const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, ROUND(PREU, 2) as preu, ESTOC as estoc, IMG as imatge FROM `producte` WHERE ACTIVAT = 1;');
         console.log("se ha ejecutado el select")
         res.json(rows);
     } catch (error) {
