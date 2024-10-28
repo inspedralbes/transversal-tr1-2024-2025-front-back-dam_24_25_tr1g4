@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
 
 dotenv.config();
 const app = express();
@@ -14,6 +16,7 @@ app.use(cors())
 app.use(bodyParser.json());
 
 const salt = bcrypt.genSaltSync(10);
+
 
 const dbConfig = {
     host: process.env.DB_HOST,
@@ -254,7 +257,8 @@ app.put('/comanda/:id', async (req, res) => {
         console.log(req.params);
         const { estat } = req.body;
         console.log(req.body);
-        await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [id, estat]);
+        await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
+        console.log("se ha ejecutado el update en la bbd");
         res.json({ id, estat});
     } catch (error) {
         res.status(500).json({ error: `Failed to update item ${error}` });
@@ -340,6 +344,7 @@ app.post('/users', async (req, res) => {
     }
 });
 
+
 app.post('/login', async (req, res) => {
     let connection;
     try {
@@ -349,8 +354,7 @@ app.post('/login', async (req, res) => {
         console.log("req.body:  ", req.body);
 
         const [userResult] = await connection.execute(
-            'SELECT correo, password FROM usuari WHERE correo = ?', // Filtrar por correo
-            [correo] 
+            'SELECT correo, password FROM usuari WHERE correo = ?', [correo] 
         );
 
         if (userResult.length === 0) {
@@ -362,12 +366,15 @@ app.post('/login', async (req, res) => {
 
         console.log( "contrta bbdd: ", usuari.password); //contra bbdd
         const passwordMatch = bcrypt.compareSync(password, usuari.password);
+        console.log(passwordMatch);
      
         if (!passwordMatch) {
             return res.status(401).json({ error: 'Contraseña incorrecta' });
         }
-        // Si la contraseña es correcta, generar un token con JWT
-        res.status(200).json({ message: 'Login exitoso', userId: usuari.id });
+        else if (passwordMatch){
+            const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            return res.status(200).json({ message: 'Login exitoso', userId: usuari.id, token });
+        }
     } catch (error) {
         res.status(500).json({ error: `Error en el login: ${error.message} `}); 
     } finally {
@@ -377,6 +384,7 @@ app.post('/login', async (req, res) => {
         }
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
