@@ -47,61 +47,45 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted } from "vue";
 import { getComandas } from "@/services/communicationManager";
 import EdicioComanda from "@/components/EdicioComanda.vue";
 
-export default {
-  components: {
-    EdicioComanda,
-  },
-  setup() {
-    const comandas = ref([]);
-    const dialog = ref(false);
-    const comandaSeleccionada = ref(null);
+const comandas = ref([]);
+const dialog = ref(false);
+const comandaSeleccionada = ref(null);
 
-    const fetchComandas = async () => {
-      try {
-        const data = await getComandas();
-        comandas.value = data;
-      } catch (error) {
-        console.error("Error al obtener las comandas:", error);
-      }
-    };
-
-    const Edicio = (comanda) => {
-      comandaSeleccionada.value = comanda;
-      dialog.value = true; 
-    };
-
-    const cerrarDialogo = () => {
-      dialog.value = false; 
-      comandaSeleccionada.value = null; 
-    };
-
-    const guardarCambios = (updatedComanda) => {
-      const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
-      if (index !== -1) {
-        comandas.value[index].estat = updatedComanda.estat;
-      }
-      cerrarDialogo(); 
-    };
-
-    onMounted(() => {
-      fetchComandas(); 
-    });
-
-    return {
-      comandas,
-      dialog,
-      comandaSeleccionada,
-      Edicio,
-      cerrarDialogo,
-      guardarCambios,
-    };
-  },
+const fetchComandas = async () => {
+  try {
+    const data = await getComandas();
+    comandas.value = data;
+  } catch (error) {
+    console.error("Error al obtener las comandas:", error);
+  }
 };
+
+const Edicio = (comanda) => {
+  comandaSeleccionada.value = { ...comanda }; 
+  dialog.value = true;  
+};
+
+const cerrarDialogo = () => {
+  dialog.value = false;
+  comandaSeleccionada.value = null;
+};
+
+const guardarCambios = (updatedComanda) => {
+  const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
+  if (index !== -1) {
+    comandas.value[index].estat = updatedComanda.estat;
+  }
+  cerrarDialogo();
+};
+
+onMounted(() => {
+  fetchComandas();
+});
 </script>
 
 <style scoped>
