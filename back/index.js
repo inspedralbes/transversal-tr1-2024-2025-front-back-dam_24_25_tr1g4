@@ -13,8 +13,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT;
 const server = http.createServer(app);
-const io = new Server(server); // Integrar Socket.IO con el servidor HT
-
+const io = new Server(server);
 
 app.use(cors())
 app.use(bodyParser.json());
@@ -88,17 +87,18 @@ app.post('/producte', async (req, res) => {
     let connection;
     try {
         connection = await connectToDatabase();
-        const {nom, preu, estoc, img, activat} = req.body;
-        console.log("se ha ejecutado la conexión");
+        const { nom, preu, estoc, img, activat } = req.body;
         const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);
-        res.json({ id: result.insertId, nom, preu, estoc, img, activat});
-        console.log("se ha hecho el insert correctamente ");
+        
+        const newProduct = { id: result.insertId, nom, preu, estoc, img, activat };
+        res.json(newProduct);
+
+        io.emit('productCreated', newProduct);
     } catch (error) {
         res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
     } finally {
         if (connection) {
             await connection.end();
-            console.log('Database connection closed.');
         }
     }
 });
@@ -117,8 +117,10 @@ app.put('/producte/:id', async (req, res) => {
             'UPDATE PRODUCTE SET nom = ?, preu = ?, estoc = ?, img = ?, activat = ? WHERE id = ?', 
             [nom, preu, estoc, img, activat, id]
         );
-        console.log("se hace el update en la bbdd");
-        res.json({ id, nom, preu, estoc, img, activat });
+        const updatedProduct = { id, nom, preu, estoc, img, activat };
+        res.json(updatedProduct);
+
+        io.emit('Producte Actualitzat: ', updatedProduct);
     } catch (error) {
         res.status(500).json({ error: `Failed to update PRODUCTE  ${error}`});
     } finally {
@@ -137,12 +139,13 @@ app.delete('/producte/:id', async (req, res) => {
         const { id } = req.params;
         await connection.execute('DELETE FROM PRODUCTE WHERE id = ?', [id]);
         res.json({ id });
+
+        io.emit('productDeleted', { id });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete PRODUCTE' });
     } finally {
         if (connection) {
             await connection.end();
-            console.log('Database connection closed.');
         }
     }
 });
