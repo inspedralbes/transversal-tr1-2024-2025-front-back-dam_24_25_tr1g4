@@ -1,8 +1,10 @@
 <script setup>
 import { onBeforeMount, reactive, ref } from 'vue';
 import { getProductes } from '@/services/communicationManager';
+import Anadir_Producto from './anadir_Producto.vue';
 const productes = ref([]);
-const producto = ref(false);
+const dialog = ref(false);
+const editableProducte = ref({});
 
 async function fetchGetProductes() {
   try {
@@ -15,6 +17,10 @@ async function fetchGetProductes() {
 onBeforeMount(() => {
   fetchGetProductes()
 });
+const openEditDialog = (productes) => {
+  editableProducte.value = {...productes};
+  dialog.value = true;
+};
 </script>
 
 <template>
@@ -25,6 +31,7 @@ onBeforeMount(() => {
           <v-icon left>mdi-exit-to-app</v-icon>
         </v-btn>
       </v-col>
+      <anadir_Producto />
     </v-row>
 
     <v-row>

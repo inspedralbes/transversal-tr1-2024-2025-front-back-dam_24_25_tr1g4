@@ -12,6 +12,7 @@ const port = process.env.PORT;
 
 app.use(cors())
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded())
 
 const dbConfig = {
     host: process.env.DB_HOST,
@@ -81,6 +82,9 @@ app.post('/producte', async (req, res) => {
     let connection;
     try {
         connection = await connectToDatabase();
+
+        console.log(req);
+
         const {nom, preu, estoc, img, activat} = req.body;
         console.log("se ha ejecutado la conexión");
         const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);

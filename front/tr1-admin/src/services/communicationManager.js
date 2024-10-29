@@ -25,4 +25,22 @@ export async function getProductes() {
   console.log(llista_productes);
   return llista_productes
 }
+export async function postProductes({nom, img, preu, estoc, activat}) {
+  const formProducte = new URLSearchParams();
+  formProducte.append('nom', nom);
+  formProducte.append('preu',preu);
+  formProducte.append('estoc',estoc);
+  formProducte.append('img',img);
+  formProducte.append('activat',activat);
 
+  const producto = await fetch(`${import.meta.env.VITE_API_ROUTE}/producte`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body : formProducte.toString()
+  });
+
+  const nuevo_producto = await producto.json();
+  return nuevo_producto;
+};
