@@ -1,8 +1,9 @@
 <script setup>
 import { onBeforeMount, reactive, ref } from 'vue';
-import { getProductes } from '@/services/communicationManager';
-const productes = ref([]);
-const producto = ref(false);
+import { getProductes, deleteProducte } from '@/services/communicationManager';
+
+const productes = ref([])
+const dialog = ref(false);
 
 async function fetchGetProductes() {
   try {
@@ -12,9 +13,21 @@ async function fetchGetProductes() {
     console.error('Error al obtener preguntas', error);
   }
 };
+
+async function handleDeleteProduct(producteId) {
+  try {
+    await deleteProducte(producteId);
+    productes.value = productes.value.filter(producte => producte.id !== producteId);
+    
+  } catch (error) {
+    console.error('Error al borrar producto', error);
+  }
+}
+
 onBeforeMount(() => {
   fetchGetProductes()
 });
+
 </script>
 
 <template>
@@ -93,7 +106,11 @@ onBeforeMount(() => {
                       </v-card>
                     </template>
                   </v-dialog>
+                  <v-btn @click=handleDeleteProduct(producte.id)>ELIMINAR</v-btn>
                 </div>
+                <div class="tabla_item">
+        <DeleteDialog :producteId="producte.id" :onDelete="handleDeleteProduct" />
+      </div>
               </div>
             </div>
           </v-card-text>
@@ -112,7 +129,7 @@ onBeforeMount(() => {
   gap: 1px;
 
   display: grid;
-  grid-template-columns: 20% 20% 30% 15%;
+  grid-template-columns: 20% 20% 30% 15% 14.5% ;
   grid-auto-rows: 50px;
 }
 .tabla_row {
@@ -120,7 +137,7 @@ onBeforeMount(() => {
 }
 .tabla-titulo {
   grid-column-start: 1;
-  grid-column-end: 7;
+  grid-column-end: 8;
 
   background-color: #e0e0e0;
   color: black;

@@ -25,4 +25,25 @@ export async function getProductes() {
   console.log(llista_productes);
   return llista_productes
 }
+export const deleteProducte = async (id) =>{
+  const response = await fetch(`${URL}/producte/${id}`, {
+      method: 'DELETE',
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  })
+  const data = await response.json()
+  return data;
+}
+export const updateProducte = async (id) =>{
+  const response = await fetch(`${URL}/producte/${id}`, {
+      method: 'PUT',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify (producte)
+  })
+  const data = await response.json()
+  return data;
+}
 
