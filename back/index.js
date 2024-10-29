@@ -3,6 +3,8 @@ import mysql from 'mysql2/promise';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 
 dotenv.config();
@@ -13,6 +15,9 @@ const port = process.env.PORT;
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded())
+
+const salt = bcrypt.genSaltSync(10);
+
 
 const dbConfig = {
     host: process.env.DB_HOST,
@@ -61,7 +66,6 @@ app.get('/producte', async (req, res) => {
 app.get('/producteAndroidApp', async (req, res) => {
     let connection;
     try {
-        console.log("esta ejecutandose el try")
         connection = await connectToDatabase();
         console.log("se ha conectado a la bbdd")
         const [rows] = await connection.execute('SELECT ID AS id, NOM as nom, ROUND(PREU, 2) as preu, ESTOC as estoc, IMG as imatge FROM `producte` WHERE ACTIVAT = 1;');
@@ -163,6 +167,34 @@ app.get('/comanda', async (req, res) => {
     }
 });
 
+//acabada
+app.get('/comandaAndroid', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        const [rows] = await connection.execute('SELECT ID as id, ESTAT as estatus, PREU_TOTAL as total, PRODUCTES as produtos FROM comanda;');
+
+        res.json({
+            valid: true,
+            data: rows
+        });
+    } catch (error) {
+    
+        res.status(500).json({
+            valid: false,
+            error: 'Failed to fetch comanda'
+        });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
+
+
+
+
 // CREATE
 app.post('/comanda', async (req, res) => {
     let connection;
@@ -183,8 +215,43 @@ app.post('/comanda', async (req, res) => {
         }
     }
 });
+ 
+//CREATE ANDORTID FUNCIONA
+app.post('/comandaAndroid', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        console.log("Conexión realizada");
 
-// UPDATE
+        const { productes } = req.body;
+
+        const results = await Promise.all(productes.map(async (producte) => {
+            const { idProducte, quantitat, preu } = producte;
+            const totalPreu = quantitat * preu;
+
+            const productesJson = JSON.stringify({ idProducte, quantitat });
+
+            const [result] = await connection.execute(
+                'INSERT INTO comanda (productes, preu_total) VALUES (?, ?)',
+                [productesJson, totalPreu]
+            );
+
+            console.log(`Producto ${idProducte} insertado correctamente en la BBDD`);
+            return { id: result.insertId, productes: productesJson, preu: totalPreu };
+        }));
+
+        res.json({ comandes: results });
+    } catch (error) {
+        res.status(500).json({ error: `Failed to create comanda: ${error.message}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
+
+// UPDATE VUE FUNCIONA
 app.put('/comanda/:id', async (req, res) => {
     let connection;
     try {
@@ -192,10 +259,11 @@ app.put('/comanda/:id', async (req, res) => {
         console.log("conexion para actualizar comanda realizada correctamente");
         const { id } = req.params;
         console.log(req.params);
-        const {idUser, productes, estat, preu_total } = req.body;
+        const { estat } = req.body;
         console.log(req.body);
-        await connection.execute('UPDATE comanda SET idUser = ?, productes = ?, estat = ?, preu_total = ?', [idUser, productes, estat, preu_total]);
-        res.json({ id, idUser, productes, estat, preu_total});
+        await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
+        console.log("se ha ejecutado el update en la bbd");
+        res.json({ id, estat});
     } catch (error) {
         res.status(500).json({ error: `Failed to update item ${error}` });
     } finally {
@@ -206,7 +274,7 @@ app.put('/comanda/:id', async (req, res) => {
     }
 });
 
-// DELETE
+// DELETE SI ES NECESARIO
 app.delete('/comanda/:id', async (req, res) => {
     let connection;
     try {
@@ -215,7 +283,7 @@ app.delete('/comanda/:id', async (req, res) => {
         await connection.execute('DELETE FROM comanda WHERE id = ?', [id]);
         res.json({ id });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to delete item' });
+        res.status(500).json({ error: `Failed to delete item ${error}` });
     } finally {
         if (connection) {
             await connection.end();
@@ -223,6 +291,105 @@ app.delete('/comanda/:id', async (req, res) => {
         }
     }
 });
+
+
+// CRUD USERS
+// READ FUNCIONA
+app.get('/users', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        const [rows] = await connection.execute('SELECT ID as idUsuari, NAME as nom, CORREO as correu, PAGAMENT as forma_pagament FROM usuari;');
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: `Failed to fetch USUARIS ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
+
+// CREATE
+app.post('/users', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        console.log("Conexión realizada");
+
+        const { name, password, pagament, correo } = req.body;
+
+        if (!name || !password || !pagament || !correo) {
+            return res.status(400).json({ error: `Todos los campos son obligatorios` });
+        }
+        console.log("datos antes de hashear la contraseña: " , req.body);
+        
+        const hashedPassword = bcrypt.hashSync(password, salt);
+
+        console.log(hashedPassword);
+        
+        const [result] = await connection.execute(
+            'INSERT INTO usuari (name, password, pagament, correo) VALUES (?, ?, ?, ?)',
+            [name, hashedPassword, pagament, correo]
+        );
+
+        console.log(result);
+        console.log("Inserción realizada correctamente en la base de datos");
+
+        res.json({ id: result.insertId, name, pagament, correo }); 
+    } catch (error) {
+        res.status(500).json({ error: `Fallo al crear usuario: ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Conexión a la base de datos cerrada.');
+        }
+    }
+});
+
+
+app.post('/login', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+
+        const { correo, password } = req.body;
+        console.log("req.body:  ", req.body);
+
+        const [userResult] = await connection.execute(
+            'SELECT correo, password FROM usuari WHERE correo = ?', [correo] 
+        );
+
+        if (userResult.length === 0) {
+            return res.status(401).json({ error: 'Usuario no encontrado' });
+        }
+
+        const usuari = userResult[0]; 
+        console.log("contra ingresada: ",password); 
+
+        console.log( "contrta bbdd: ", usuari.password); //contra bbdd
+        const passwordMatch = bcrypt.compareSync(password, usuari.password);
+        console.log(passwordMatch);
+     
+        if (!passwordMatch) {
+            return res.status(401).json({ error: 'Contraseña incorrecta' });
+        }
+        else if (passwordMatch){
+            // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL 
+            const token = "2";
+            return res.status(200).json({ message: 'Login exitoso', userId: usuari.id, token });
+        }
+    } catch (error) {
+        res.status(500).json({ error: `Error en el login: ${error.message} `}); 
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
