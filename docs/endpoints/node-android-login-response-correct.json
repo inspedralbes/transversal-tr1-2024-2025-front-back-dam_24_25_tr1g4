@@ -1,4 +1,9 @@
 {
     "valid": true,
-    "token": "eyJhbGci"
+    "usuari": {
+        "id": 1,
+        "nom": "",
+        "email": "",
+        "token": "eyJhbGci"
+    }
 }

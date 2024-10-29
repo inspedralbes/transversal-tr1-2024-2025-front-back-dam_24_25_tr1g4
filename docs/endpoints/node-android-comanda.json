@@ -1,16 +1,18 @@
-{
-    "id": 0,
-    "productes": [
-        {
-            "idProducte": "String",
-            "quantitat": 3,
-            "preu": 0.0
-        },
-        {
-            "idProducte": "String",
-            "quantitat": 3,
-            "preu": 0.0
-        }
-    ],
-    "estat": 1
-}
+[
+    {
+        "id": 0,
+        "productes": [
+            {
+                "idProducte": "String",
+                "quantitat": 3,
+                "preu": 0.0
+            },
+            {
+                "idProducte": "String",
+                "quantitat": 3,
+                "preu": 0.0
+            }
+        ],
+        "estat": 1
+    }
+]

@@ -350,31 +350,45 @@ app.post('/login', async (req, res) => {
     try {
         connection = await connectToDatabase();
 
-        const { correo, password } = req.body;
+        const { correu, contrasenya } = req.body;
         console.log("req.body:  ", req.body);
 
         const [userResult] = await connection.execute(
-            'SELECT correo, password FROM usuari WHERE correo = ?', [correo] 
+            'SELECT id, name, correo, password FROM usuari WHERE correo = ?', [correu] 
         );
 
         if (userResult.length === 0) {
-            return res.status(401).json({ error: 'Usuario no encontrado' });
+            return res.status(200).json({ 
+                valid: false, 
+                usuari: null
+            });
         }
 
         const usuari = userResult[0]; 
-        console.log("contra ingresada: ",password); 
+        console.log("contra ingresada: ",contrasenya); 
 
         console.log( "contrta bbdd: ", usuari.password); //contra bbdd
-        const passwordMatch = bcrypt.compareSync(password, usuari.password);
+        const passwordMatch = bcrypt.compareSync(contrasenya, usuari.password);
         console.log(passwordMatch);
      
         if (!passwordMatch) {
-            return res.status(401).json({ error: 'Contraseña incorrecta' });
+            return res.status(200).json({ 
+                valid: false, 
+                usuari: null
+             });
         }
         else if (passwordMatch){
             // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL 
             const token = "2";
-            return res.status(200).json({ message: 'Login exitoso', userId: usuari.id, token });
+            return res.status(200).json({ 
+                valid: true, 
+                usuari: {
+                    id: usuari.id,
+                    nom: usuari.name,
+                    email: usuari.correo,
+                    token
+                }
+             });
         }
     } catch (error) {
         res.status(500).json({ error: `Error en el login: ${error.message} `}); 
