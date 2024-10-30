@@ -48,12 +48,12 @@ export const updateProducte = async (producte) =>{
   const data = await response.json()
   return data;
 }
-export async function postProductes({nom, img, preu, estoc, activat}) {
+export async function postProductes({nom, imatge, preu, estoc, activat}) {
   const formProducte = new URLSearchParams();
   formProducte.append('nom', nom);
   formProducte.append('preu',preu);
   formProducte.append('estoc',estoc);
-  formProducte.append('img',img);
+  formProducte.append('imatge',imatge);
   formProducte.append('activat',activat);
 
   const producto = await fetch(`${import.meta.env.VITE_API_ROUTE}/producte`, {

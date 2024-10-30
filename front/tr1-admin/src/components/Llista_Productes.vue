@@ -2,9 +2,10 @@
 import { onBeforeMount, reactive, ref } from "vue";
 import { getProductes, deleteProducte } from "@/services/communicationManager";
 import EditarProducte from "./EditarProducte.vue";
-import Anadir_Producto from "./Anadir_Producto.vue";
+import Anadir_Producto from "./anadir_Producto.vue";
 const productes = ref([]);
 const dialog = ref(false);
+const addDialog = ref(false);
 const producteSeleccionat = reactive({
   producte: null,
 });
@@ -33,8 +34,13 @@ function openEditDialog(producte) {
   dialog.value = true;
 }
 
+function openCreateDialog() {
+  addDialog.value = true;
+}
+
 function cerrarDialogo() {
   dialog.value = false;
+  addDialog.value = false;
   producteSeleccionat.producte = null;
 }
 
@@ -42,16 +48,15 @@ async function guardarCambios(updatedProducte) {
   const index = productes.value.findIndex((p) => p.id === updatedProducte.id);
   if (index !== -1) {
     productes.value[index] = updatedProducte;
+  } else {
+    productes.value.push(updatedProducte)
   }
 }
 
 onBeforeMount(() => {
   fetchGetProductes();
 });
-const openEditDialog = (productes) => {
-  editableProducte.value = {...productes};
-  dialog.value = true;
-};
+
 </script>
 
 <template>
@@ -63,6 +68,7 @@ const openEditDialog = (productes) => {
         </v-btn>
       </v-col>
       <Anadir_Producto />
+      <v-btn @click="openCreateDialog(producte)">Afegir Producte</v-btn>
     </v-row>
 
     <v-row>
@@ -178,6 +184,12 @@ const openEditDialog = (productes) => {
         </v-card>
         <EditarProducte
           v-model="dialog"
+          :producte="producteSeleccionat.producte"
+          @cerrar="cerrarDialogo"
+          @guardar="guardarCambios"
+        />
+        <AfegirProducte
+          v-model="addDialog"
           :producte="producteSeleccionat.producte"
           @cerrar="cerrarDialogo"
           @guardar="guardarCambios"

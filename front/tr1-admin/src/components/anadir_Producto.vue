@@ -35,9 +35,9 @@ import { postProductes } from '@/services/communicationManager';
 </script>
 
 <template>
-    <v-btn @click="aparecer_añadir">
+    <!-- <v-btn @click="aparecer_añadir">
         Añadir Producte
-    </v-btn>
+    </v-btn> -->
     <div v-if="añadir">
     <v-card>
         <v-card-title>

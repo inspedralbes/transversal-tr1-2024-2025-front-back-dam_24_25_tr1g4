@@ -89,7 +89,8 @@ app.post('/producte', async (req, res) => {
 
         console.log(req);
 
-        const {nom, preu, estoc, img, activat} = req.body;
+        const {nom, preu, estoc, imatge, activat} = req.body;
+        let img = imatge
         console.log("se ha ejecutado la conexión");
         const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);
         res.json({ id: result.insertId, nom, preu, estoc, img, activat});
