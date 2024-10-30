@@ -2,7 +2,7 @@
 import { onBeforeMount, reactive, ref } from "vue";
 import { getProductes, deleteProducte } from "@/services/communicationManager";
 import EditarProducte from "./EditarProducte.vue";
-
+import Anadir_Producto from "./Anadir_Producto.vue";
 const productes = ref([]);
 const dialog = ref(false);
 const producteSeleccionat = reactive({
@@ -48,6 +48,10 @@ async function guardarCambios(updatedProducte) {
 onBeforeMount(() => {
   fetchGetProductes();
 });
+const openEditDialog = (productes) => {
+  editableProducte.value = {...productes};
+  dialog.value = true;
+};
 </script>
 
 <template>
@@ -58,6 +62,7 @@ onBeforeMount(() => {
           <v-icon left>mdi-exit-to-app</v-icon>
         </v-btn>
       </v-col>
+      <Anadir_Producto />
     </v-row>
 
     <v-row>
