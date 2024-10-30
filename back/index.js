@@ -104,8 +104,10 @@ app.put('/producte/:id', async (req, res) => {
         console.log("conexion establecida");
         const { id } = req.params;
         console.log(req.params);
-        const { nom, preu, estoc, img, activat} = req.body;
+        const { nom, preu, estoc, imatge, activat} = req.body;
+        let img = imatge
         console.log(req.body);
+        // console.log(`UPDATE PRODUCTE SET nom = ${nom}, preu = ${preu}, estoc = ${estoc}, img = ${img}, activat = ${activat} WHERE id = ${id}`);
         await connection.execute(
             'UPDATE PRODUCTE SET nom = ?, preu = ?, estoc = ?, img = ?, activat = ? WHERE id = ?', 
             [nom, preu, estoc, img, activat, id]

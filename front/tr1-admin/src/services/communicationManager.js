@@ -35,13 +35,15 @@ export const deleteProducte = async (id) =>{
   const data = await response.json()
   return data;
 }
-export const updateProducte = async (id) =>{
-  const response = await fetch(`${URL}/producte/${id}`, {
+
+export const updateProducte = async (producte) =>{
+  console.log(producte);
+  const response = await fetch(`${URL}/producte/${producte.id}`, {
       method: 'PUT',
       headers: {
           'Content-Type': 'application/json'
       },
-      body: JSON.stringify (producte)
+      body: JSON.stringify(producte)
   })
   const data = await response.json()
   return data;
