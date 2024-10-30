@@ -64,13 +64,12 @@ watch(() => props.modelValue, (newValue) => {
   }
 });
 
-const guardarCambios = async () => {
+async function guardarCambios() {
   try {
-    console.log("Comanda a actualizar:", comandaEditable.value); 
-    const updatedComanda = await updateComanda(comandaEditable.value.id, {
+    await updateComanda(comandaEditable.value.id, {
       estat: comandaEditable.value.estat,
     });
-    emit("guardar", updatedComanda);
+    emit("guardar", comandaEditable.value);
     cerrarDialogo();
   } catch (error) {
     console.error("Error al guardar los cambios:", error);

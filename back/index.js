@@ -86,9 +86,6 @@ app.post('/producte', async (req, res) => {
     let connection;
     try {
         connection = await connectToDatabase();
-
-        console.log(req);
-
         const {nom, preu, estoc, imatge, activat} = req.body;
         let img = imatge
         console.log("se ha ejecutado la conexión");

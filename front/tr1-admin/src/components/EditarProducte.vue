@@ -23,6 +23,14 @@
             v-model="editableProducte.estoc"
             type="number"
           ></v-text-field>
+          <v-switch
+          v-model="editableProducte.activat"
+          color="primary"
+          label="Activat"
+          false-value=0
+          true-value=1
+          hide-details
+        ></v-switch>
         </v-card-text>
         <v-card-actions>
           <v-btn text @click="cerrarDialogo">Cancelar</v-btn>
@@ -58,8 +66,10 @@
    }
  });
  
- async function guardarCambios() {
+async function guardarCambios() {
   try {
+    editableProducte.value.activat = editableProducte.value.activat ? 1 : 2;
+
     await updateProducte(editableProducte.value); 
     emit('guardar', editableProducte.value);
     cerrarDialogo();
@@ -67,7 +77,7 @@
     console.error('Error al guardar los cambios:', error);
   }
 }
- 
+
  const cerrarDialogo = () => {
    emit("update:modelValue", false);
    isDialogOpen.value = false;
