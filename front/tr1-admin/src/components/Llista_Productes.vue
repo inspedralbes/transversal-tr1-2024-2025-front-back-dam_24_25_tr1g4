@@ -1,9 +1,11 @@
 <script setup>
 import { onBeforeMount, reactive, ref } from 'vue';
 import { getProductes, deleteProducte } from '@/services/communicationManager';
+import EditarProducte from './EditarProducte.vue';
 
 const productes = ref([])
 const dialog = ref(false);
+const producteSeleccionat = ref(null);
 
 async function fetchGetProductes() {
   try {
@@ -23,6 +25,23 @@ async function handleDeleteProduct(producteId) {
     console.error('Error al borrar producto', error);
   }
 }
+function openEditDialog(producte) {
+  producteSeleccionat.value = { ...producte };
+  dialog.value = true; 
+}
+
+function cerrarDialogo() {
+  dialog.value = false;
+  producteSeleccionat.value = null; 
+}
+
+async function guardarCambios(updatedProducte) {
+  const index = productes.value.findIndex(p => p.id === updatedProducte.id);
+  if (index !== -1) {
+    productes.value[index] = updatedProducte; 
+  }
+}
+
 
 onBeforeMount(() => {
   fetchGetProductes()
@@ -48,7 +67,7 @@ onBeforeMount(() => {
               <div class="tabla-titulo">Productes</div>
               <div class="tabla_apartados">ID</div>
               <div class="tabla_apartados">NOM</div>
-              <div class="tabla_apartados"></div>
+              <div class="tabla_apartados">IMG</div>
               <div class="tabla_apartados">PREU</div>
               <div class="tabla_apartados">ESTOC</div>
 
@@ -65,7 +84,8 @@ onBeforeMount(() => {
                 <div class="tabla_item">{{ producte.estoc }}</div>
                 <!-- <div class="tabla_item">{{ comanda.productes }}</div> -->
                 <div class="tabla_item">
-                  <v-dialog v-model="dialog" max-width="500">
+
+                  <!-- <v-dialog v-model="dialog" max-width="500">
                     <template v-slot:activator="{ props: activatorProps }">
                       <v-btn
                         v-bind="activatorProps"
@@ -105,16 +125,20 @@ onBeforeMount(() => {
                         </v-card-actions>
                       </v-card>
                     </template>
-                  </v-dialog>
+                  </v-dialog> -->
+                  <v-btn @click="openEditDialog(producte)">Editar</v-btn>
                   <v-btn @click=handleDeleteProduct(producte.id)>ELIMINAR</v-btn>
                 </div>
-                <div class="tabla_item">
-        <DeleteDialog :producteId="producte.id" :onDelete="handleDeleteProduct" />
-      </div>
               </div>
             </div>
           </v-card-text>
         </v-card>
+        <EditarProducte
+          v-model="dialog"
+          :producte="producteSeleccionat"
+          @cerrar="cerrarDialogo"
+          @guardar="guardarCambios"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -137,7 +161,7 @@ onBeforeMount(() => {
 }
 .tabla-titulo {
   grid-column-start: 1;
-  grid-column-end: 8;
+  grid-column-end: 7;
 
   background-color: #e0e0e0;
   color: black;
