@@ -93,7 +93,7 @@ app.post('/producte', async (req, res) => {
         const newProduct = { id: result.insertId, nom, preu, estoc, img, activat };
         res.json(newProduct);
 
-        io.emit('productCreated', newProduct);
+        io.emit('productCreated', newProduct); 
     } catch (error) {
         res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
     } finally {
@@ -120,7 +120,7 @@ app.put('/producte/:id', async (req, res) => {
         const updatedProduct = { id, nom, preu, estoc, img, activat };
         res.json(updatedProduct);
 
-        io.emit('Producte Actualitzat: ', updatedProduct);
+        io.emit('Producte_Actualitzat: ', updatedProduct);
     } catch (error) {
         res.status(500).json({ error: `Failed to update PRODUCTE  ${error}`});
     } finally {
@@ -195,8 +195,6 @@ app.get('/comandaAndroid', async (req, res) => {
 });
 
 
-
-
 // CREATE
 app.post('/comanda', async (req, res) => {
     let connection;
@@ -253,6 +251,8 @@ app.post('/comandaAndroid', async (req, res) => {
     }
 });
 
+
+
 // UPDATE VUE FUNCIONA
 app.put('/comanda/:id', async (req, res) => {
     let connection;
@@ -265,6 +265,7 @@ app.put('/comanda/:id', async (req, res) => {
         console.log(req.body);
         await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
         console.log("se ha ejecutado el update en la bbd");
+        io.emit('Comanda_Actualizada ', { id, estat });
         res.json({ id, estat});
     } catch (error) {
         res.status(500).json({ error: `Failed to update item ${error}` });
