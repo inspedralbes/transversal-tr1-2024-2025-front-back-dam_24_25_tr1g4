@@ -5,12 +5,27 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-
+import { createServer } from 'http';    
+import { Server } from 'socket.io'; 
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
 
+const server = createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: '*',   
+        methods: ['GET', 'POST']  
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('New client connected');
+    socket.on('disconnect', () => {
+      console.log('Client disconnected');
+    });
+  });
 
 app.use(cors())
 app.use(bodyParser.json());
@@ -252,17 +267,45 @@ app.post('/comandaAndroid', async (req, res) => {
 });
 
 // UPDATE VUE FUNCIONA
+// app.put('/comanda/:id', async (req, res) => {
+//     let connection;
+//     try {
+//         connection = await connectToDatabase();
+//         console.log("conexion para actualizar comanda realizada correctamente");
+//         const { id } = req.params;
+//         console.log(req.params);
+//         const { estat } = req.body;
+//         console.log(req.body);
+//         await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
+//         res.json({ id, estat,});
+//     } catch (error) {
+//         res.status(500).json({ error: `Failed to update item ${error}` });
+//     } finally {
+//         if (connection) {
+//             await connection.end();
+//             console.log('Database connection closed.');
+//         }
+//     }
+// });
+
+
+// UPDATE COMANDA CON SOCKET.IO (PRUEBA)
 app.put('/comanda/:id', async (req, res) => {
     let connection;
     try {
         connection = await connectToDatabase();
-        console.log("conexion para actualizar comanda realizada correctamente");
+        console.log("Conexión para actualizar comanda realizada correctamente");
+        
         const { id } = req.params;
-        console.log(req.params);
         const { estat } = req.body;
-        console.log(req.body);
+
         await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
-        res.json({ id, estat,});
+        console.log("Se hizo el update en la BBDD");
+
+        const comandaActualizada = { id, estat };
+        io.emit('actualizarComanda', comandaActualizada);
+
+        res.json(comandaActualizada);
     } catch (error) {
         res.status(500).json({ error: `Failed to update item ${error}` });
     } finally {
@@ -272,6 +315,7 @@ app.put('/comanda/:id', async (req, res) => {
         }
     }
 });
+
 
 // DELETE SI ES NECESARIO
 app.delete('/comanda/:id', async (req, res) => {
