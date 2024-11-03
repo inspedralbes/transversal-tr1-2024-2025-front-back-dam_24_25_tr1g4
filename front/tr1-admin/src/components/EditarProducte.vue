@@ -27,8 +27,8 @@
           v-model="editableProducte.activat"
           color="primary"
           label="Activat"
-          false-value=0
-          true-value=1
+          :false-value= "0"
+          :true-value= "1"
           hide-details
         ></v-switch>
         </v-card-text>
@@ -68,7 +68,7 @@
  
 async function guardarCambios() {
   try {
-    editableProducte.value.activat = editableProducte.value.activat ? 1 : 2;
+    editableProducte.value.activat = editableProducte.value.activat ? 1 : 0;
 
     await updateProducte(editableProducte.value); 
     emit('guardar', editableProducte.value);

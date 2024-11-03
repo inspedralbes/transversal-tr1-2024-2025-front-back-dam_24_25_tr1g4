@@ -22,8 +22,8 @@
           v-model="editableProducte.activat"
           color="primary"
           label="Activat"
-          false-value="0"
-          true-value="1"
+          :false-value="0"
+          :true-value="1"
           hide-details
         ></v-switch>
       </v-card-text>
