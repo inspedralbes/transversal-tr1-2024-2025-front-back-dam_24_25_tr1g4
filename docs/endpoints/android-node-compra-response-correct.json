@@ -1,9 +1,3 @@
 {
-    "valid": true,
-    "comanda": {
-        "id": 1,
-        "estatus": "aberta",
-        "total": 0,
-        "produtes": []
-    }
+    "valid": true
 }

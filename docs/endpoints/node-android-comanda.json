@@ -1,18 +1,142 @@
 [
     {
-        "id": 0,
-        "productes": [
-            {
-                "idProducte": "String",
-                "quantitat": 3,
-                "preu": 0.0
-            },
-            {
-                "idProducte": "String",
-                "quantitat": 3,
-                "preu": 0.0
-            }
-        ],
-        "estat": 1
+      "id": 1,
+      "estat": 1,
+      "iduser": 1,
+      "preu_total": 30,
+      "productes": "Cable HDMI 2.1, Cable USB-C a USB-A"
+    },
+    {
+      "id": 2,
+      "estat": 2,
+      "iduser": 2,
+      "preu_total": 15,
+      "productes": "Cable Ethernet Cat 6"
+    },
+    {
+      "id": 3,
+      "estat": 1,
+      "iduser": 3,
+      "preu_total": 12,
+      "productes": "Cable de carga Micro USB, Cable de audio 3.5mm"
+    },
+    {
+      "id": 4,
+      "estat": 0,
+      "iduser": 4,
+      "preu_total": 25,
+      "productes": "Cable Lightning a USB"
+    },
+    {
+      "id": 5,
+      "estat": 1,
+      "iduser": 5,
+      "preu_total": 16,
+      "productes": "Cable VGA a HDMI"
+    },
+    {
+      "id": 6,
+      "estat": 1,
+      "iduser": 6,
+      "preu_total": 30,
+      "productes": "Cable DisplayPort a HDMI"
+    },
+    {
+      "id": 7,
+      "estat": 2,
+      "iduser": 7,
+      "preu_total": 35,
+      "productes": "Cable RCA a RCA, Cable de audio óptico"
+    },
+    {
+      "id": 8,
+      "estat": 1,
+      "iduser": 8,
+      "preu_total": 13,
+      "productes": "Cable USB-C a USB-C"
+    },
+    {
+      "id": 9,
+      "estat": 0,
+      "iduser": 9,
+      "preu_total": 12,
+      "productes": "Cable de corriente C13"
+    },
+    {
+      "id": 10,
+      "estat": 1,
+      "iduser": 10,
+      "preu_total": 9,
+      "productes": "Cable SATA a SATA"
+    },
+    {
+      "id": 11,
+      "estat": 2,
+      "iduser": 11,
+      "preu_total": 12,
+      "productes": "Cable de red Cat 5e"
+    },
+    {
+      "id": 12,
+      "estat": 1,
+      "iduser": 12,
+      "preu_total": 17,
+      "productes": "Cable de carga rápido USB"
+    },
+    {
+      "id": 13,
+      "estat": 0,
+      "iduser": 13,
+      "preu_total": 19,
+      "productes": "Cable HDMI a DVI"
+    },
+    {
+      "id": 14,
+      "estat": 1,
+      "iduser": 14,
+      "preu_total": 40,
+      "productes": "Cable de carga para laptop"
+    },
+    {
+      "id": 15,
+      "estat": 2,
+      "iduser": 15,
+      "preu_total": 28,
+      "productes": "Cable USB a RS232"
+    },
+    {
+      "id": 16,
+      "estat": 1,
+      "iduser": 16,
+      "preu_total": 12,
+      "productes": "Cable adaptador de corriente"
+    },
+    {
+      "id": 17,
+      "estat": 1,
+      "iduser": 17,
+      "preu_total": 15,
+      "productes": "Cable de extensión de audio"
+    },
+    {
+      "id": 18,
+      "estat": 2,
+      "iduser": 18,
+      "preu_total": 30,
+      "productes": "Cable HDMI 2.1, Cable USB-C a USB-A"
+    },
+    {
+      "id": 19,
+      "estat": 1,
+      "iduser": 19,
+      "preu_total": 7,
+      "productes": "Cable de audio 3.5mm"
+    },
+    {
+      "id": 20,
+      "estat": 1,
+      "iduser": 20,
+      "preu_total": 35,
+      "productes": "Cable de red Cat 6, Cable VGA a HDMI"
     }
-]
+  ]

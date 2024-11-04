@@ -152,6 +152,12 @@ app.get('/comanda', async (req, res) => {
     try {
         connection = await connectToDatabase();
         const [rows] = await connection.execute('SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;');
+        rows.forEach(row => {
+            row.preu_total = parseFloat(row.preu_total).toFixed(2);
+            row.preu_total = parseFloat(row.preu_total);
+            // console.log(typeof row.preu_total);
+        });
+        console.log(rows);
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch comanda' });
@@ -164,29 +170,29 @@ app.get('/comanda', async (req, res) => {
 });
 
 //acabada
-app.get('/comandaAndroid', async (req, res) => {
-    let connection;
-    try {
-        connection = await connectToDatabase();
-        const [rows] = await connection.execute('SELECT ID as id, ESTAT as estatus, PREU_TOTAL as total, PRODUCTES as produtos FROM comanda;');
+// app.get('/comandaAndroid', async (req, res) => {
+//     let connection;
+//     try {
+//         connection = await connectToDatabase();
+//         const [rows] = await connection.execute('SELECT ID as id, ESTAT as estatus, PREU_TOTAL as total, PRODUCTES as produtos FROM comanda;');
 
-        res.json({
-            valid: true,
-            data: rows
-        });
-    } catch (error) {
+//         res.json({
+//             valid: true,
+//             data: rows
+//         });
+//     } catch (error) {
     
-        res.status(500).json({
-            valid: false,
-            error: 'Failed to fetch comanda'
-        });
-    } finally {
-        if (connection) {
-            await connection.end();
-            console.log('Database connection closed.');
-        }
-    }
-});
+//         res.status(500).json({
+//             valid: false,
+//             error: 'Failed to fetch comanda'
+//         });
+//     } finally {
+//         if (connection) {
+//             await connection.end();
+//             console.log('Database connection closed.');
+//         }
+//     }
+// });
 
 
 
@@ -197,13 +203,19 @@ app.post('/comanda', async (req, res) => {
     try {
         connection = await connectToDatabase();
         console.log("conexion realizada");
-        const {idUser, productes, estat, preu_total } = req.body;
-        const [result] = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
-        console.log("insert realizado correctamente en la bbdd");
+        let {idUsuari, productes, preuTotal } = req.body;
         console.log(req.body);
-        res.json({ id: result.insertId, idUser, productes, estat, preu_total});
+        const preu_total = preuTotal;
+        const idUser = idUsuari;
+        productes = JSON.stringify(productes);
+        const estat = 0;
+        const {result, error} = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
+        console.log("insert realizado correctamente en la bbdd");
+        
+        res.json({ valid: true });
     } catch (error) {
-        res.status(500).json({ error: `Failed to create comanda ${error}` });
+        console.log(error);
+        res.json({ valid: false });
     } finally {
         if (connection) {
             await connection.end();
@@ -212,7 +224,7 @@ app.post('/comanda', async (req, res) => {
     }
 });
  
-//CREATE ANDORTID FUNCIONA
+//CREATE ANDOROID FUNCIONA
 app.post('/comandaAndroid', async (req, res) => {
     let connection;
     try {
@@ -236,9 +248,9 @@ app.post('/comandaAndroid', async (req, res) => {
             return { id: result.insertId, productes: productesJson, preu: totalPreu };
         }));
 
-        res.json({ comandes: results });
+        res.json({valid: true});
     } catch (error) {
-        res.status(500).json({ error: `Failed to create comanda: ${error.message}` });
+        res.json({valid: false});
     } finally {
         if (connection) {
             await connection.end();
@@ -374,7 +386,12 @@ app.post('/login', async (req, res) => {
         if (!passwordMatch) {
             return res.status(200).json({ 
                 valid: false, 
-                usuari: null
+                usuari: {
+                    id: 0,
+                    nom: "none",
+                    email: "none",
+                    token
+                }
              });
         }
         else if (passwordMatch){

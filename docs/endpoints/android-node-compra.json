@@ -1,5 +1,5 @@
 {
-    "idUsuari": "String",
+    "idUsuari": 0,
     "productes": [
         {
             "idProducte": "String",
