@@ -93,7 +93,7 @@ app.post('/producte', async (req, res) => {
         const newProduct = { id: result.insertId, nom, preu, estoc, img, activat };
         res.json(newProduct);
 
-        io.emit('productCreated', newProduct); 
+        io.emit('Producto_Creado', newProduct); 
     } catch (error) {
         res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
     } finally {
@@ -140,7 +140,7 @@ app.delete('/producte/:id', async (req, res) => {
         await connection.execute('DELETE FROM PRODUCTE WHERE id = ?', [id]);
         res.json({ id });
 
-        io.emit('productDeleted', { id });
+        io.emit('Producte_Eliminat', { id });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete PRODUCTE' });
     } finally {
@@ -153,7 +153,7 @@ app.delete('/producte/:id', async (req, res) => {
 // CRUD COMANDA
 
 // READ
-app.get('/comanda', async (req, res) => {
+app.get('/comanda', async (res) => {
     let connection;
     try {
         connection = await connectToDatabase();
@@ -170,7 +170,7 @@ app.get('/comanda', async (req, res) => {
 });
 
 //acabada
-app.get('/comandaAndroid', async (req, res) => {
+app.get('/comandaAndroid', async (res) => {
     let connection;
     try {
         connection = await connectToDatabase();
@@ -204,7 +204,7 @@ app.post('/comanda', async (req, res) => {
         const {idUser, productes, estat, preu_total } = req.body;
         const [result] = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
         console.log("insert realizado correctamente en la bbdd");
-        console.log(req.body);
+        io.emit('comanda_creada', req.body);
         res.json({ id: result.insertId, idUser, productes, estat, preu_total});
     } catch (error) {
         res.status(500).json({ error: `Failed to create comanda ${error}` });
@@ -239,7 +239,7 @@ app.post('/comandaAndroid', async (req, res) => {
             console.log(`Producto ${idProducte} insertado correctamente en la BBDD`);
             return { id: result.insertId, productes: productesJson, preu: totalPreu };
         }));
-
+        io.emit('comanda_creada', req.body);
         res.json({ comandes: results });
     } catch (error) {
         res.status(500).json({ error: `Failed to create comanda: ${error.message}` });
@@ -284,6 +284,7 @@ app.delete('/comanda/:id', async (req, res) => {
         connection = await connectToDatabase();
         const { id } = req.params;
         await connection.execute('DELETE FROM comanda WHERE id = ?', [id]);
+        io.emit('Comanda_Eliminada' , {id})
         res.json({ id });
     } catch (error) {
         res.status(500).json({ error: `Failed to delete item ${error}` });
@@ -383,6 +384,8 @@ app.post('/login', async (req, res) => {
             const token = "2";
             return res.status(200).json({ message: 'Login exitoso', userId: usuari.id, token });
         }
+
+        io.emit('usuario_login', { userId: usuari.id, correo: usuari.correo });
     } catch (error) {
         res.status(500).json({ error: `Error en el login: ${error.message} `}); 
     } finally {
@@ -390,6 +393,7 @@ app.post('/login', async (req, res) => {
             await connection.end();
             console.log('Database connection closed.');
         }
+
     }
 });
 
