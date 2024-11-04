@@ -16,7 +16,7 @@ const server = createServer(app);
 const io = new Server(server, {
     cors: {
         origin: '*',   
-        methods: ['GET', 'POST']  
+        methods: ['GET', 'POST','PUT']  
     }
 });
 
@@ -300,9 +300,10 @@ app.put('/comanda/:id', async (req, res) => {
         const { estat } = req.body;
 
         await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
-        console.log("Se hizo el update en la BBDD");
+        console.log("Update fet en la BBDD");
 
         const comandaActualizada = { id, estat };
+        console.log('Canviant estat de la comanda:', comandaActualizada);
         io.emit('actualizarComanda', comandaActualizada);
 
         res.json(comandaActualizada);
