@@ -86,11 +86,11 @@ app.post('/producte', async (req, res) => {
     let connection;
     try {
         connection = await connectToDatabase();
-        const {nom, preu, estoc, imatge, activat} = req.body;
+        const { nom, preu, estoc, imatge, activat } = req.body;
         let img = imatge
         console.log("se ha ejecutado la conexión");
         const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);
-        res.json({ id: result.insertId, nom, preu, estoc, img, activat});
+        res.json({ id: result.insertId, nom, preu, estoc, img, activat });
         console.log("se ha hecho el insert correctamente ");
     } catch (error) {
         res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
@@ -110,18 +110,18 @@ app.put('/producte/:id', async (req, res) => {
         console.log("conexion establecida");
         const { id } = req.params;
         console.log(req.params);
-        const { nom, preu, estoc, imatge, activat} = req.body;
+        const { nom, preu, estoc, imatge, activat } = req.body;
         let img = imatge
         console.log(req.body);
         // console.log(`UPDATE PRODUCTE SET nom = ${nom}, preu = ${preu}, estoc = ${estoc}, img = ${img}, activat = ${activat} WHERE id = ${id}`);
         await connection.execute(
-            'UPDATE PRODUCTE SET nom = ?, preu = ?, estoc = ?, img = ?, activat = ? WHERE id = ?', 
+            'UPDATE PRODUCTE SET nom = ?, preu = ?, estoc = ?, img = ?, activat = ? WHERE id = ?',
             [nom, preu, estoc, img, activat, id]
         );
         console.log("se hace el update en la bbdd");
         res.json({ id, nom, preu, estoc, img, activat });
     } catch (error) {
-        res.status(500).json({ error: `Failed to update PRODUCTE  ${error}`});
+        res.status(500).json({ error: `Failed to update PRODUCTE  ${error}` });
     } finally {
         if (connection) {
             await connection.end();
@@ -185,7 +185,7 @@ app.get('/comanda', async (req, res) => {
 //             data: rows
 //         });
 //     } catch (error) {
-    
+
 //         res.status(500).json({
 //             valid: false,
 //             error: 'Failed to fetch comanda'
@@ -207,15 +207,15 @@ app.post('/comanda', async (req, res) => {
     try {
         connection = await connectToDatabase();
         console.log("conexion realizada");
-        let {idUsuari, productes, preuTotal } = req.body;
+        let { idUsuari, productes, preuTotal } = req.body;
         console.log(req.body);
         const preu_total = preuTotal;
         const idUser = idUsuari;
         productes = JSON.stringify(productes);
         const estat = 0;
-        const {result, error} = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
+        const { result, error } = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
         console.log("insert realizado correctamente en la bbdd");
-        
+
         res.json({ valid: true });
     } catch (error) {
         console.log(error);
@@ -227,7 +227,7 @@ app.post('/comanda', async (req, res) => {
         }
     }
 });
- 
+
 //CREATE ANDOROID FUNCIONA
 app.post('/comandaAndroid', async (req, res) => {
     let connection;
@@ -252,9 +252,9 @@ app.post('/comandaAndroid', async (req, res) => {
             return { id: result.insertId, productes: productesJson, preu: totalPreu };
         }));
 
-        res.json({valid: true});
+        res.json({ valid: true });
     } catch (error) {
-        res.json({valid: false});
+        res.json({ valid: false });
     } finally {
         if (connection) {
             await connection.end();
@@ -274,7 +274,7 @@ app.put('/comanda/:id', async (req, res) => {
         const { estat } = req.body;
         console.log(req.body);
         await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
-        res.json({ id, estat,});
+        res.json({ id, estat, });
     } catch (error) {
         res.status(500).json({ error: `Failed to update item ${error}` });
     } finally {
@@ -334,23 +334,61 @@ app.post('/users', async (req, res) => {
         if (!name || !password || !pagament || !correo) {
             return res.status(400).json({ error: `Todos los campos son obligatorios` });
         }
-        console.log("datos antes de hashear la contraseña: " , req.body);
-        
+
+        const [checkExistingUser] = await connection.execute(
+            'SELECT * FROM usuari WHERE correo = ?', [correo]
+        );
+
+        if (checkExistingUser.length > 0) {
+            console.log("El usuario ya existe en la base de datos");
+            const token = "2";
+            return res.status(200).json({
+                valid: false,
+                usuari: {
+                    id: 0,
+                    nom: "none",
+                    email: "none",
+                    token
+                }
+            });
+        }
+        console.log("datos antes de hashear la contraseña: ", req.body);
+
         const hashedPassword = bcrypt.hashSync(password, salt);
 
         console.log(hashedPassword);
-        
+
         const [result] = await connection.execute(
             'INSERT INTO usuari (name, password, pagament, correo) VALUES (?, ?, ?, ?)',
             [name, hashedPassword, pagament, correo]
         );
-
-        console.log(result);
         console.log("Inserción realizada correctamente en la base de datos");
 
-        res.json({ id: result.insertId, name, pagament, correo }); 
+        // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL 
+        const token = "2";
+        return res.status(200).json({
+            valid: true,
+            usuari: {
+                id: result.insertId,
+                nom: name,
+                email: correo,
+                token
+            }
+        });
+
+
     } catch (error) {
-        res.status(500).json({ error: `Fallo al crear usuario: ${error}` });
+        console.log(error);
+        const token = "2";
+        return res.status(200).json({
+            valid: false,
+            usuari: {
+                id: 0,
+                nom: "none",
+                email: "none",
+                token
+            }
+        });
     } finally {
         if (connection) {
             await connection.end();
@@ -369,49 +407,56 @@ app.post('/login', async (req, res) => {
         console.log("req.body:  ", req.body);
 
         const [userResult] = await connection.execute(
-            'SELECT id, name, correo, password FROM usuari WHERE correo = ?', [correu] 
+            'SELECT id, name, correo, password FROM usuari WHERE correo = ?', [correu]
         );
 
         if (userResult.length === 0) {
-            return res.status(200).json({ 
-                valid: false, 
-                usuari: null
-            });
-        }
-
-        const usuari = userResult[0]; 
-        console.log("contra ingresada: ",contrasenya); 
-
-        console.log( "contrta bbdd: ", usuari.password); //contra bbdd
-        const passwordMatch = bcrypt.compareSync(contrasenya, usuari.password);
-        console.log(passwordMatch);
-     
-        if (!passwordMatch) {
-            return res.status(200).json({ 
-                valid: false, 
+            const token = "2";
+            return res.status(200).json({
+                valid: false,
                 usuari: {
                     id: 0,
                     nom: "none",
                     email: "none",
                     token
                 }
-             });
+            });
         }
-        else if (passwordMatch){
+
+        const usuari = userResult[0];
+        console.log("contra ingresada: ", contrasenya);
+
+        console.log("contrta bbdd: ", usuari.password); //contra bbdd
+        const passwordMatch = bcrypt.compareSync(contrasenya, usuari.password);
+        console.log(passwordMatch);
+
+        if (!passwordMatch) {
+            const token = "2";
+            return res.status(200).json({
+                valid: false,
+                usuari: {
+                    id: 0,
+                    nom: "none",
+                    email: "none",
+                    token
+                }
+            });
+        }
+        else if (passwordMatch) {
             // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL 
             const token = "2";
-            return res.status(200).json({ 
-                valid: true, 
+            return res.status(200).json({
+                valid: true,
                 usuari: {
                     id: usuari.id,
                     nom: usuari.name,
                     email: usuari.correo,
                     token
                 }
-             });
+            });
         }
     } catch (error) {
-        res.status(500).json({ error: `Error en el login: ${error.message} `}); 
+        res.status(500).json({ error: `Error en el login: ${error.message} ` });
     } finally {
         if (connection) {
             await connection.end();
