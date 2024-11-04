@@ -14,6 +14,7 @@ const port = process.env.PORT;
 
 app.use(cors())
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded())
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -85,7 +86,8 @@ app.post('/producte', async (req, res) => {
     let connection;
     try {
         connection = await connectToDatabase();
-        const {nom, preu, estoc, img, activat} = req.body;
+        const {nom, preu, estoc, imatge, activat} = req.body;
+        let img = imatge
         console.log("se ha ejecutado la conexión");
         const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);
         res.json({ id: result.insertId, nom, preu, estoc, img, activat});
@@ -108,8 +110,10 @@ app.put('/producte/:id', async (req, res) => {
         console.log("conexion establecida");
         const { id } = req.params;
         console.log(req.params);
-        const { nom, preu, estoc, img, activat} = req.body;
+        const { nom, preu, estoc, imatge, activat} = req.body;
+        let img = imatge
         console.log(req.body);
+        // console.log(`UPDATE PRODUCTE SET nom = ${nom}, preu = ${preu}, estoc = ${estoc}, img = ${img}, activat = ${activat} WHERE id = ${id}`);
         await connection.execute(
             'UPDATE PRODUCTE SET nom = ?, preu = ?, estoc = ?, img = ?, activat = ? WHERE id = ?', 
             [nom, preu, estoc, img, activat, id]
@@ -270,8 +274,7 @@ app.put('/comanda/:id', async (req, res) => {
         const { estat } = req.body;
         console.log(req.body);
         await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
-        console.log("se ha ejecutado el update en la bbd");
-        res.json({ id, estat});
+        res.json({ id, estat,});
     } catch (error) {
         res.status(500).json({ error: `Failed to update item ${error}` });
     } finally {
