@@ -62,11 +62,6 @@ onBeforeMount(() => {
 <template>
   <v-container>
     <v-row justify="start">
-      <v-col cols="12" md="2">
-        <v-btn color="black" class="exit-btn" @click="handleExit">
-          <v-icon left>mdi-exit-to-app</v-icon>
-        </v-btn>
-      </v-col>
       <Anadir_Producto />
       <v-btn @click="openCreateDialog(producte)">Afegir Producte</v-btn>
     </v-row>

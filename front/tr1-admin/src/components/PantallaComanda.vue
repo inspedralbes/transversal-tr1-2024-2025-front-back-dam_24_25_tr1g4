@@ -1,12 +1,5 @@
 <template>
   <v-container>
-    <v-row justify="start">
-      <v-col cols="12" md="2">
-        <v-btn color="black" class="exit-btn" @click="handleExit">
-          <v-icon left>mdi-exit-to-app</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
 
     <v-row>
       <v-col cols="12" md="10" offset-md="1">
@@ -26,11 +19,11 @@
                 class="tabla_row"
               >
                 <div class="tabla_item">{{ comanda.id }}</div>
-                <div class="tabla_item">{{ comanda.estat }}</div>
+                <div class="tabla_item">{{ comanda.estat==0?"Rebuda":comanda.estat==1?"En preparació":comanda.estat==2?"Preparada":"Recollida" }}</div>
                 <div class="tabla_item">{{ comanda.iduser }}</div>
-                <div class="tabla_item">{{ comanda.preu_total }}</div>
+                <div class="tabla_item">{{ comanda.preu_total }}€</div>
                 <div class="tabla_item">
-                  <v-btn color="surface-variant" text @click="Edicio(comanda)">Editar</v-btn>
+                  <v-btn color="surface-variant" text @click="Edicio(comanda)">Canviar estat</v-btn>
                 </div>
               </div>
             </div>
@@ -97,7 +90,7 @@ onMounted(() => {
   gap: 1px;
 
   display: grid;
-  grid-template-columns: 20% 20% 30% 15%;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1.5fr;
   grid-auto-rows: 50px;           
 }
 .tabla_row {
