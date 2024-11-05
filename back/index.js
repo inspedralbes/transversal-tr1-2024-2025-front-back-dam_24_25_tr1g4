@@ -39,8 +39,10 @@ io.on('connection', (socket) => {
     //despues actualiza todo el array de comandas,porque asi es mucho mas fácil
     // io.emit
     //hacer un console.log :eligiendo estado de la comanda
+    console.log("Eligiendo estado de la comanda");
     try {
         const connection = await connectToDatabase();
+        // const [comandaSeleccionada] = await connection.execute('SELECT ID as id, ESTAT as estat FROM comanda WHERE ID = ?;', [id]); 
         const [comandes] = await connection.execute('SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;');
         io.emit('actualizarArrayComandes', comandes);
         await connection.end();
@@ -323,9 +325,9 @@ app.put('/comanda/:id', async (req, res) => {
         console.log("Update fet en la BBDD");
 
         const comandaActualizada = { id, estat };
-        console.log('Canviant estat de la comanda:', comandaActualizada);
-        socketSendComandes()
-        io.emit('comandaUpdated', comandaActualizada);
+        // console.log('Canviant estat de la comanda:', comandaActualizada);
+        // await socketSendComandes(io);
+        // io.emit('comandaUpdated', comandaActualizada);
 
         await socketSendComandes(io);
 
