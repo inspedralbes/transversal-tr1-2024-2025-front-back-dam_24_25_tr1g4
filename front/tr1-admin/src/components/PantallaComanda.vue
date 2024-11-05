@@ -60,6 +60,8 @@ const comandas = ref([]);
 const dialog = ref(false);
 const comandaSeleccionada = ref(null);
 
+const socket = io("http://localhost:" + import.meta.env.VITE_APP_PORT);
+
 const fetchComandas = async () => {
   try {
     const data = await getComandas();
@@ -90,11 +92,11 @@ const guardarCambios = (updatedComanda) => {
 onMounted(() => {
   fetchComandas();
   socket.on("comandaUpdated", (updatedComanda) => {
-    const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
-    if (index !== -1) {
-      comandas.value[index].estat = updatedComanda.estat;
-    }
-  });
+        const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
+        if (index !== -1) {
+            comandas.value[index].estat = updatedComanda.estat;
+        }
+    });
 });
 
 onUnmounted(() => {
