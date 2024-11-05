@@ -30,7 +30,9 @@
                 <div class="tabla_item">{{ comanda.iduser }}</div>
                 <div class="tabla_item">{{ comanda.preu_total }}</div>
                 <div class="tabla_item">
-                  <v-btn color="surface-variant" text @click="Edicio(comanda)">Editar</v-btn>
+                  <v-btn color="surface-variant" text @click="Edicio(comanda)"
+                    >Editar</v-btn
+                  >
                 </div>
               </div>
             </div>
@@ -52,12 +54,11 @@ import { ref, onMounted } from "vue";
 import { getComandas } from "@/services/communicationManager";
 import EdicioComanda from "@/components/EdicioComanda.vue";
 import { io } from "socket.io-client";
+import { socket } from "@/services/socket";
 
 const comandas = ref([]);
 const dialog = ref(false);
 const comandaSeleccionada = ref(null);
-
-const socket = io("http://localhost:" + import.meta.env.VITE_APP_PORT);
 
 const fetchComandas = async () => {
   try {
@@ -69,8 +70,8 @@ const fetchComandas = async () => {
 };
 
 const Edicio = (comanda) => {
-  comandaSeleccionada.value = { ...comanda }; 
-  dialog.value = true;  
+  comandaSeleccionada.value = { ...comanda };
+  dialog.value = true;
 };
 
 const cerrarDialogo = () => {
@@ -89,17 +90,16 @@ const guardarCambios = (updatedComanda) => {
 onMounted(() => {
   fetchComandas();
   socket.on("comandaUpdated", (updatedComanda) => {
-        const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
-        if (index !== -1) {
-            comandas.value[index].estat = updatedComanda.estat;
-        }
-    });
+    const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
+    if (index !== -1) {
+      comandas.value[index].estat = updatedComanda.estat;
+    }
+  });
 });
 
 onUnmounted(() => {
-    socket.disconnect();
+  socket.disconnect();
 });
-
 </script>
 
 <style scoped>
@@ -112,7 +112,7 @@ onUnmounted(() => {
 
   display: grid;
   grid-template-columns: 20% 20% 30% 15%;
-  grid-auto-rows: 50px;           
+  grid-auto-rows: 50px;
 }
 .tabla_row {
   display: contents;
@@ -150,5 +150,4 @@ onUnmounted(() => {
   top: 10px;
   left: 10px;
 }
-
 </style>

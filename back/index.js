@@ -13,21 +13,24 @@ const app = express();
 const port = process.env.PORT;
 
 const server = createServer(app);
+
+
 const io = new Server(server, {
     cors: {
-        origin: '*',   
-        methods: ['GET', 'POST']  
+        origin: '*',
+        methods: ["GET", "POST"]  
     }
 });
 
 io.on('connection', (socket) => {
     console.log('New client connected');
+    socket.emit("conected", "hola, te has conectado!!!!!")
     socket.on('disconnect', () => {
       console.log('Client disconnected');
     });
   });
 
-app.use(cors())
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded())
 
@@ -267,26 +270,26 @@ app.post('/comandaAndroid', async (req, res) => {
 });
 
 // UPDATE VUE FUNCIONA
-// app.put('/comanda/:id', async (req, res) => {
-//     let connection;
-//     try {
-//         connection = await connectToDatabase();
-//         console.log("conexion para actualizar comanda realizada correctamente");
-//         const { id } = req.params;
-//         console.log(req.params);
-//         const { estat } = req.body;
-//         console.log(req.body);
-//         await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
-//         res.json({ id, estat,});
-//     } catch (error) {
-//         res.status(500).json({ error: `Failed to update item ${error}` });
-//     } finally {
-//         if (connection) {
-//             await connection.end();
-//             console.log('Database connection closed.');
-//         }
-//     }
-// });
+app.put('/comanda/:id', async (req, res) => {
+    let connection;
+    try {
+        connection = await connectToDatabase();
+        console.log("conexion para actualizar comanda realizada correctamente");
+        const { id } = req.params;
+        console.log(req.params);
+        const { estat } = req.body;
+        console.log(req.body);
+        await connection.execute('UPDATE comanda SET estat = ? WHERE id = ?', [estat, id]);
+        res.json({ id, estat,});
+    } catch (error) {
+        res.status(500).json({ error: `Failed to update item ${error}` });
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed.');
+        }
+    }
+});
 
 
 // UPDATE COMANDA CON SOCKET.IO (PRUEBA)
