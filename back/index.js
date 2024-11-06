@@ -44,6 +44,11 @@ io.on('connection', (socket) => {
         const connection = await connectToDatabase();
         // const [comandaSeleccionada] = await connection.execute('SELECT ID as id, ESTAT as estat FROM comanda WHERE ID = ?;', [id]); 
         const [comandes] = await connection.execute('SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;');
+        comandes.forEach(row => {
+            row.preu_total = parseFloat(row.preu_total).toFixed(2);
+            row.preu_total = parseFloat(row.preu_total);
+            // console.log(typeof row.preu_total);
+        });
         io.emit('actualizarArrayComandes', comandes);
         await connection.end();
     } catch (error) {
