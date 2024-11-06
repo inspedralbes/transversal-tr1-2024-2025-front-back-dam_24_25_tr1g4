@@ -51,7 +51,7 @@ const comandas = ref([]);
 const dialog = ref(false);
 const comandaSeleccionada = ref(null);
 
-const URL = "http://localhost:3001";
+const URL = import.meta.env.VITE_API_ROUTE;
 
 const socket = io(URL);
 
@@ -92,6 +92,7 @@ const guardarCambios = (updatedComanda) => {
 
 onMounted(() => {
   fetchComandas();
+  
   socket.on("comandaUpdated", (updatedComanda) => {
     const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
     if (index !== -1) {
@@ -100,7 +101,8 @@ onMounted(() => {
   });
 
   socket.on("actualizarArrayComandes", (comandasActualizadas) => {
-    comandas.value = comandasActualizadas;
+    const comandasParseadas = JSON.parse(comandasActualizadas);
+    comandas.value = comandasParseadas;
   });
 });
 
