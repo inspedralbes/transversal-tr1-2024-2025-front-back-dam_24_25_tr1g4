@@ -4,10 +4,10 @@
       <v-card-title>Producte</v-card-title>
       <v-card-text>
         <v-text-field label="Nom" v-model="editableProducte.nom"></v-text-field>
-        <v-text-field
+        <v-file-input
           label="Imatge"
           v-model="editableProducte.imatge"
-        ></v-text-field>
+        ></v-file-input>
         <v-text-field
           label="Preu "
           v-model="editableProducte.preu"

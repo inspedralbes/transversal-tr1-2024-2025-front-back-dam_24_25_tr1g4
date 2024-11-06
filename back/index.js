@@ -7,6 +7,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import http from 'http';    
 import { Server } from 'socket.io'; 
+import multer from 'multer';
+import path from 'path';
 
 dotenv.config();
 const app = express();
@@ -64,6 +66,18 @@ const dbConfig = {
     database: process.env.DB_NAME
 };
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/'); 
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname)); 
+    }
+});
+const upload = multer({ storage: storage });
+
+
 app.use('/assets', express.static('public'))
 
 async function connectToDatabase() {
@@ -119,15 +133,17 @@ app.get('/producteAndroidApp', async (req, res) => {
 });
 
 // CREATE
-app.post('/producte', async (req, res) => {
+app.post('/producte', upload.single('img'),  async (req, res) => {
     let connection;
     try {
         connection = await connectToDatabase();
-        const {nom, preu, estoc, imatge, activat} = req.body;
-        let img = imatge
+
+        const {nom, preu, estoc, img, activat} = req.body;
+        const fotoRuta = req.file.path;
+        console.log(fotoRuta);
         console.log("se ha ejecutado la conexión");
         const [result] = await connection.execute('INSERT INTO PRODUCTE (NOM, PREU, ESTOC, IMG, ACTIVAT) VALUES (?, ?, ?, ?, ?)', [nom, preu, estoc, img, activat]);
-        res.json({ id: result.insertId, nom, preu, estoc, img, activat});
+        res.json({ id: result.insertId, nom, preu, estoc, fotoRuta, activat});
         console.log("se ha hecho el insert correctamente ");
     } catch (error) {
         res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
