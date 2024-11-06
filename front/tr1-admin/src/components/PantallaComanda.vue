@@ -44,10 +44,24 @@
 import { ref, onMounted } from "vue";
 import { getComandas } from "@/services/communicationManager";
 import EdicioComanda from "@/components/EdicioComanda.vue";
+import { io } from "socket.io-client";
 
+// import { socket } from "@/services/socket";
 const comandas = ref([]);
 const dialog = ref(false);
 const comandaSeleccionada = ref(null);
+
+const URL = "http://localhost:3001";
+
+const socket = io(URL);
+
+socket.on("connect", () => {
+    console.log("connected");
+});
+
+socket.on("conected", (msg) => {
+  console.log(msg);
+})
 
 const fetchComandas = async () => {
   try {
@@ -59,8 +73,8 @@ const fetchComandas = async () => {
 };
 
 const Edicio = (comanda) => {
-  comandaSeleccionada.value = { ...comanda }; 
-  dialog.value = true;  
+  comandaSeleccionada.value = { ...comanda };
+  dialog.value = true;
 };
 
 const cerrarDialogo = () => {
@@ -78,6 +92,20 @@ const guardarCambios = (updatedComanda) => {
 
 onMounted(() => {
   fetchComandas();
+  socket.on("comandaUpdated", (updatedComanda) => {
+    const index = comandas.value.findIndex((c) => c.id === updatedComanda.id);
+    if (index !== -1) {
+      comandas.value[index].estat = updatedComanda.estat;
+    }
+  });
+
+  socket.on("actualizarArrayComandes", (comandasActualizadas) => {
+    comandas.value = comandasActualizadas;
+  });
+});
+
+onUnmounted(() => {
+  socket.disconnect();
 });
 </script>
 
@@ -129,5 +157,4 @@ onMounted(() => {
   top: 10px;
   left: 10px;
 }
-
 </style>
