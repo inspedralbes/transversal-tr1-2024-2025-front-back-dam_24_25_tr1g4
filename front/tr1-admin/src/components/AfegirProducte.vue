@@ -7,6 +7,7 @@
         <v-file-input
           label="Imatge"
           v-model="editableProducte.imatge"
+          ref="imatge"
         ></v-file-input>
         <v-text-field
           label="Preu "
@@ -38,6 +39,7 @@
 import { ref, watch, defineProps, defineEmits } from "vue";
 import { postProductes } from "@/services/communicationManager";
 
+
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -49,6 +51,7 @@ const emit = defineEmits(["update:modelValue", "cerrar", "guardar"]);
 
 const editableProducte = ref({});
 const isDialogOpen = ref(props.modelValue);
+const imatge = ref(null); 
 
 watch(
   () => props.modelValue,
@@ -62,12 +65,22 @@ watch(
 
 async function guardarCambios() {
   try {
-    const producteCreat = await postProductes(editableProducte.value);
+    const productoData ={
+      nom: editableProducte.value.nom,
+      preu: editableProducte.value.preu,
+      estoc: editableProducte.value.estoc,
+      activat: editableProducte.value.activat,
+    };
+
+    const imageInput = document.querySelector('input[type="file"]');
+
+    const producteCreat = await postProductes(productoData, imageInput.files[0] );
+    
     editableProducte.value.id = producteCreat.id;
-    emit("guardar", editableProducte.value);
+
     cerrarDialogo();
   } catch (error) {
-    console.error("Error al guardar los cambios:", error);
+    console.error( `Error al guardar los cambios: ${error}`);
   }
 }
 

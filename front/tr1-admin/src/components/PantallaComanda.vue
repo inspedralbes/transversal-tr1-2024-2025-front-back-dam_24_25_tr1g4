@@ -60,7 +60,7 @@ const comandas = ref([]);
 const dialog = ref(false);
 const comandaSeleccionada = ref(null);
 
-const URL = "http://localhost:3001";
+const URL = import.meta.env.VITE_API_ROUTE;
 
 const socket = io(URL);
 
@@ -109,6 +109,7 @@ onMounted(() => {
   });
 
   socket.on("actualizarArrayComandes", (comandasActualizadas) => {
+    console.log("Actualitzant comandes");
     comandas.value = comandasActualizadas;
   });
 });
