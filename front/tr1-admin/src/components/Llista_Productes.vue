@@ -69,8 +69,8 @@ onBeforeMount(() => {
   //   }
   // });
   socket.on("actualizarProductes", (productosActualizados) => {
-    console.log(productosActualizados.producte);
-    productes.value = productosActualizados.producte;
+    console.log(productosActualizados);
+    productes.value = productosActualizados;
   });
 });
 

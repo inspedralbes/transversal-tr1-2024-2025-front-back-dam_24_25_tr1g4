@@ -9,6 +9,7 @@ import http from "http";
 import { Server } from "socket.io";
 import multer from "multer";
 import path from "path";
+import * as fs from 'fs';
 
 dotenv.config();
 const app = express();
@@ -54,20 +55,20 @@ const socketSendComandes = async (io) => {
   }
 };
 async function actualizarProductos(io) {
-    try {
-        const connection = await connectToDatabase();
-        const [producte] = await connection.execute(
-          "SELECT ID as id, NOM as nom, ROUND(PREU, 2) as preu, ESTOC as estoc, IMG as imatge, ACTIVAT as activat FROM producte;"
-        );
-    
-        console.log(producte);
-    
-        io.emit("actualizarProductes", producte);
-    
-        await connection.end();
-      } catch (error) {
-        console.error("Error al obtener el array de producte:", error);
-      }
+  try {
+    const connection = await connectToDatabase();
+    const [producte] = await connection.execute(
+      "SELECT ID as id, NOM as nom, ROUND(PREU, 2) as preu, ESTOC as estoc, IMG as imatge, ACTIVAT as activat FROM producte;"
+    );
+
+    console.log(producte);
+
+    io.emit("actualizarProductes", producte);
+
+    await connection.end();
+  } catch (error) {
+    console.error("Error al obtener el array de producte:", error);
+  }
 }
 // const actualizarProductos = async (io) => {
 //   try {
@@ -194,11 +195,9 @@ app.post("/producte", upload.single("imatge"), async (req, res) => {
     } catch (e) {
       console.log(e);
     }
-
     //socket pero de los productos
     // const producteActualizado = { id, nom, preu, estoc, filename, activat };
     res.json({ id: result.insertId, nom, preu, estoc, filename, activat });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: `Failed to create PRODUCTE ${error}` });
@@ -244,10 +243,25 @@ app.delete("/producte/:id", async (req, res) => {
   try {
     connection = await connectToDatabase();
     const { id } = req.params;
-    await connection.execute("DELETE FROM PRODUCTE WHERE id = ?", [id]);
-    res.json({ id });
+    const [rows] = await connection.execute("SELECT img FROM producte WHERE id = ?",[id]);
+    if (rows.length > 0) {
+      const fotoRuta = rows[0].img;
+      const filePath = `./public/${fotoRuta}`;
+      try {
+        await fs.promises.access(filePath);
+        await fs.promises.unlink(filePath);
+        console.log(`Archivo eliminado: ${filePath}`);
+      } catch (error) {
+        console.error("El archivo no existe o no pudo ser eliminado:", error);
+      }
+      await connection.execute("DELETE FROM producte WHERE id = ?", [id]);
+      res.json({ id });
+    } else {
+      res.status(404).send("Producte no trobat");
+    }
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete PRODUCTE" });
+    console.error("Error al eliminar el producto:", error);
+    res.status(500).json({ error: "Failed to delete producte" });
   } finally {
     if (connection) {
       await connection.end();
