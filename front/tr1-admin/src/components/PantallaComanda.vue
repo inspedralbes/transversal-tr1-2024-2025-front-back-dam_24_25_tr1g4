@@ -51,7 +51,7 @@ const comandas = ref([]);
 const dialog = ref(false);
 const comandaSeleccionada = ref(null);
 
-const URL = import.meta.env.VITE_API_ROUTE;
+
 const URL = import.meta.env.VITE_API_ROUTE;
 
 const socket = io(URL);
