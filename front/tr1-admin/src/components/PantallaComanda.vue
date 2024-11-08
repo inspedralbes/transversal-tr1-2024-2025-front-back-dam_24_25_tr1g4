@@ -2,7 +2,7 @@
   <v-container class="mt-5">
     <v-alert 
     class="mb-5"
-    text="Els estats de les comandes funcionen d'aquesta manera; 1:Rebuda, 2:En preparació, 3:Recollida"
+    text="Els estats de les comandes funcionen d'aquesta manera; 0:Rebuda, 1:En preparació, 2:Preparada, 3:Recollida"
     title="Estat de les comandes"
     type="info"
     variant="tonal"
