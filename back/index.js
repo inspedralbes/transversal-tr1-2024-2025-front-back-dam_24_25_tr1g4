@@ -5,16 +5,17 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { parse } from 'path';
+import { promises as fs } from 'fs';
 
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
 
-
 app.use(cors())
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded())
+app.use(bodyParser.urlencoded());
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -209,13 +210,45 @@ app.post('/comanda', async (req, res) => {
         console.log("conexion realizada");
         let { idUsuari, productes, preuTotal } = req.body;
         console.log(req.body);
+        const sumaCuantitats = productes.reduce((acc, cur) => acc + cur.quantitat, 0);
         const preu_total = preuTotal;
         const idUser = idUsuari;
+        const [rows] = await connection.execute('SELECT NAME FROM usuari WHERE ID = ?', [idUser]);
+        const clientNombre = rows[0]?.NAME;
         productes = JSON.stringify(productes);
         const estat = 0;
         const { result, error } = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
         console.log("insert realizado correctamente en la bbdd");
-
+        let json;
+        const data = await fs.readFile('./TakeAway/comandas.json', 'utf8', (err) => {
+            if (err) {
+                console.err('Error al leer el archivo JSON');
+                return;
+            }
+        });
+        json = JSON.parse(data);
+        const novaComanda = {
+            ID : idUser,
+            Clients : clientNombre,
+            Ventes : sumaCuantitats,
+            Diners : preu_total,
+            Diners_venda : (preu_total/sumaCuantitats).toFixed(2),
+            Moneda : "euro"
+        }
+        json.comandas.push(novaComanda);
+        fs.writeFile('./TakeAway/comandas.json', JSON.stringify(json, null, 2), (error) => {
+            if(error) {
+                console.error('Ha ocurrido un error:', error);
+            } else {
+                console.log('Se ha añadido con exito');
+            }
+        });
+        const compras = await fs.readFile('./TakeAway/comandas.json', 'utf8', (err) => {
+            if (err) {
+                console.err('Error al leer el archivo JSON');
+                return;
+            }
+        });
         res.json({ valid: true });
     } catch (error) {
         console.log(error);
@@ -230,7 +263,6 @@ app.post('/comanda', async (req, res) => {
 
 //CREATE ANDOROID FUNCIONA
 app.post('/comandaAndroid', async (req, res) => {
-    let connection;
     try {
         connection = await connectToDatabase();
         console.log("Conexión realizada");
@@ -251,8 +283,32 @@ app.post('/comandaAndroid', async (req, res) => {
             console.log(`Producto ${idProducte} insertado correctamente en la BBDD`);
             return { id: result.insertId, productes: productesJson, preu: totalPreu };
         }));
+        /*fs.readFile('./TakeAway/comandas.json', 'utf8', (err, data) => {
+            if (err) {
+                console.err('Error al leer el archivo JSON');
+                return;
+            }
+            json = JSON.parse(data);
+        });
 
+        const novaComanda = {
+            ID : results[0].id,
+            Clients : await connection.execute('SELECT NAME FROM usuari u JOIN comanda c WHERE u.ID = c.IDUSER WHERE c.IDUSER = ?', [results[0].id]),
+            Ventes : results.reduce((acc, cur) => acc + cur.quantitat, 0),
+            Diners : results.reduce((acc, cur) => acc + cur.preu, 0),
+            Diners_venda : results.reduce((acc, cur) => acc + cur.quantitat, 0)/results.reduce((acc, cur) => acc + cur.preu, 0),
+            Moneda : "€"
+        }
+        json.comanda.push(novaComanda);
+        fs.writeFile('./TakeAway/comandas.json', JSON.stringify(json, null, 2), (error) => {
+            if(error) {
+                console.error('Ha ocurrido un error:', error);
+            } else {
+                console.log('Se ha añadido con exito');
+            }
+        });*/
         res.json({ valid: true });
+        
     } catch (error) {
         res.json({ valid: false });
     } finally {
