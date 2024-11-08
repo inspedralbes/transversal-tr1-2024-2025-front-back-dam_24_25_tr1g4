@@ -57,21 +57,24 @@ export const updateProducte = async (producte) =>{
   const data = await response.json()
   return data;
 }
-export async function postProductes({nom, imatge, preu, estoc, activat}) {
-  const formProducte = new URLSearchParams();
-  formProducte.append('nom', nom);
-  formProducte.append('preu',preu);
-  formProducte.append('estoc',estoc);
+export async function postProductes(producte, imatge) {
+  const formProducte= new FormData();
+  console.log(producte);
+  formProducte.append('nom', producte.nom);
+  formProducte.append('preu',producte.preu);
+  formProducte.append('estoc',producte.estoc);
   formProducte.append('imatge',imatge);
-  formProducte.append('activat',activat);
+  formProducte.append('activat',producte.activat);
 
   const producto = await fetch(`${import.meta.env.VITE_API_ROUTE}/producte`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body : formProducte.toString()
+    body : formProducte
   });
+  if (!producto.ok) {
+    const errorText = await producto.text();
+    throw new Error(`Error al crear el producto: ${errorText}`);
+  }
+
 
   const nuevo_producto = await producto.json();
   return nuevo_producto;

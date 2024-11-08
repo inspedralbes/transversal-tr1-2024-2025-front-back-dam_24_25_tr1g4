@@ -10,14 +10,14 @@ const URL = "http://localhost:3001";
 
 export const socket = io(URL);
 
-socket.on("connect", () => {
-    console.log("connected");
-});
+// socket.on("connect", () => {
+//     console.log("connected");
+// });
 
 
 
-  socket.on("conected", (msg) => {
-    console.log(msg);
-  });
+//   socket.on("conected", (msg) => {
+//     console.log(msg);
+//   });
 
 

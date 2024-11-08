@@ -3,6 +3,13 @@ import { onBeforeMount, reactive, ref } from "vue";
 import { getProductes, deleteProducte } from "@/services/communicationManager";
 import EditarProducte from "./EditarProducte.vue";
 import Anadir_Producto from "./anadir_Producto.vue";
+import { io } from "socket.io-client";
+
+const URL = import.meta.env.VITE_API_ROUTE;
+
+const socket = io(URL);
+
+
 const productes = ref([]);
 const dialog = ref(false);
 const addDialog = ref(false);
@@ -55,6 +62,16 @@ async function guardarCambios(updatedProducte) {
 
 onBeforeMount(() => {
   fetchGetProductes();
+  // socket.on("producteUpdated", (updatedProducte) => {
+  //   const index = productes.value.findIndex((c) => c.id === updatedProducte.id);
+  //   if (index !== -1) {
+  //     productes.value[index].estat = updatedComanda.estat;
+  //   }
+  // });
+  socket.on("actualizarProductes", (productosActualizados) => {
+    console.log(productosActualizados);
+    productes.value = productosActualizados;
+  });
 });
 
 </script>
@@ -97,53 +114,10 @@ onBeforeMount(() => {
                 <div class="tabla_item">{{ producte.estoc }}</div>
                 <div class="tabla_item">{{ producte.activat?"yes":"no" }}</div>
 
-                <!-- <div class="tabla_item">{{ comanda.productes }}</div> -->
                 <div class="tabla_item tabla_btns">
-                  <!-- <v-dialog v-model="dialog" max-width="500">
-                    <template v-slot:activator="{ props: activatorProps }">
-                      <v-btn
-                        v-bind="activatorProps"
-                        color="surface-variant"
-                        text="Editar"
-                        variant="flat"
-                        @click="openEditDialog(producto)"
-                      ></v-btn>
-                    </template>
-
-                    <template v-slot:default>
-                      <v-card title="Edició de producte">
-                        <v-card-text>
-                          <v-text-field
-                            label="Nom"
-                            v-model="editableProducte.nom"
-                          ></v-text-field>
-                          <v-text-field
-                            label="Imagen"
-                            v-model="editableProducte.imatge"
-                          ></v-text-field>
-                          <v-textarea
-                            label="Preu"
-                            v-model="editableProducte.preu"
-                            type="number"
-                          ></v-textarea>
-                          <v-textarea
-                            label="Estoc"
-                            v-model="editableProducte.estoc"
-                            type="number"
-                          ></v-textarea>
-                        </v-card-text>
-                       <v-card-actions>
-                          <v-spacer></v-spacer>
-                          <v-btn text="Cancel" @click="dialog = false"></v-btn>
-                          <v-btn color="primary" text="Save" @click="saveEdit"></v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </template>
-                  </v-dialog> -->
+                  
                   <v-btn @click="openEditDialog(producte)">Editar</v-btn>
-                  <!-- <v-btn @click="handleDeleteProduct(producte.id)"
-                    >ELIMINAR</v-btn
-                  > -->
+                 
                   <v-dialog max-width="500">
                     <template v-slot:activator="{ props: activatorProps }">
                       <v-btn

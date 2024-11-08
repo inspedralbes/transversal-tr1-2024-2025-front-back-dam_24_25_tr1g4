@@ -1,8 +1,7 @@
 <template>
-  <PantallaComanda />
+  <Inici />
 
 </template>
 
 <script setup>
-  //
 </script>
