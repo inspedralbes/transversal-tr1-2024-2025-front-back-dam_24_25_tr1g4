@@ -183,6 +183,14 @@
       "Diners": 600,
       "Diners_venda": "6.67",
       "Moneda": "euro"
+    },
+    {
+      "ID": 5,
+      "Clients": "María López",
+      "Ventes": 5,
+      "Diners": 50,
+      "Diners_venda": "10.00",
+      "Moneda": "euro"
     }
   ]
 }
