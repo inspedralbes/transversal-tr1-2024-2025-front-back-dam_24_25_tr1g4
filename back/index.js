@@ -10,8 +10,6 @@ import { Server } from "socket.io";
 import multer from "multer";
 import path from "path";
 import * as fs from "fs";
-import { parse } from 'path';
-import { promises as fs } from 'fs';
 
 
 dotenv.config();
@@ -343,11 +341,11 @@ app.post("/comanda", async (req, res) => {
     console.log("conexion realizada");
     let { idUsuari, productes, preuTotal } = req.body;
     console.log(req.body);
-        const sumaCuantitats = productes.reduce((acc, cur) => acc + cur.quantitat, 0);
+    const sumaCuantitats = productes.reduce((acc, cur) => acc + cur.quantitat, 0);
     const preu_total = preuTotal;
     const idUser = idUsuari;
-        const [rows] = await connection.execute('SELECT NAME FROM usuari WHERE ID = ?', [idUser]);
-        const clientNombre = rows[0]?.NAME;
+    const [rows] = await connection.execute('SELECT NAME FROM usuari WHERE ID = ?', [idUser]);
+    const clientNombre = rows[0]?.NAME;
     productes = JSON.stringify(productes);
     const estat = 0;
     await Promise.all([
@@ -357,38 +355,39 @@ app.post("/comanda", async (req, res) => {
       ),
       actualizarEstoc(JSON.parse(productes)),
     ]);
-    
+
     console.log("insert realizado correctamente en la bbdd");
-        let json;
-        const data = await fs.readFile('./TakeAway/comandas.json', 'utf8', (err) => {
-            if (err) {
-                console.err('Error al leer el archivo JSON');
-                return;
-            }
-        });
-        json = JSON.parse(data);
-        const novaComanda = {
-            ID : idUser,
-            Clients : clientNombre,
-            Ventes : sumaCuantitats,
-            Diners : preu_total,
-            Diners_venda : (preu_total/sumaCuantitats).toFixed(2),
-            Moneda : "euro"
-        }
-        json.comandas.push(novaComanda);
-        fs.writeFile('./TakeAway/comandas.json', JSON.stringify(json, null, 2), (error) => {
-            if(error) {
-                console.error('Ha ocurrido un error:', error);
-            } else {
-                console.log('Se ha añadido con exito');
-            }
-        });
-        const compras = await fs.readFile('./TakeAway/comandas.json', 'utf8', (err) => {
-            if (err) {
-                console.err('Error al leer el archivo JSON');
-                return;
-            }
-        });
+    let json;
+    const data = fs.readFileSync('./TakeAway/comandas.json', 'utf8', (err) => {
+      if (err) {
+        console.err('Error al leer el archivo JSON');
+        return;
+      }
+    });
+    console.log(data);
+    json = JSON.parse(data);
+    const novaComanda = {
+      ID: idUser,
+      Clients: clientNombre,
+      Ventes: sumaCuantitats,
+      Diners: preu_total,
+      Diners_venda: (preu_total / sumaCuantitats).toFixed(2),
+      Moneda: "euro"
+    }
+    json.comandas.push(novaComanda);
+    fs.writeFile('./TakeAway/comandas.json', JSON.stringify(json, null, 2), (error) => {
+      if (error) {
+        console.error('Ha ocurrido un error:', error);
+      } else {
+        console.log('Se ha añadido con exito');
+      }
+    });
+    const compras = await fs.readFile('./TakeAway/comandas.json', 'utf8', (err) => {
+      if (err) {
+        console.err('Error al leer el archivo JSON');
+        return;
+      }
+    });
     res.json({ valid: true });
   } catch (error) {
     console.log(error);
@@ -432,32 +431,32 @@ app.post("/comandaAndroid", async (req, res) => {
         };
       })
     );
-        /*fs.readFile('./TakeAway/comandas.json', 'utf8', (err, data) => {
-            if (err) {
-                console.err('Error al leer el archivo JSON');
-                return;
-            }
-            json = JSON.parse(data);
-        });
-
-        const novaComanda = {
-            ID : results[0].id,
-            Clients : await connection.execute('SELECT NAME FROM usuari u JOIN comanda c WHERE u.ID = c.IDUSER WHERE c.IDUSER = ?', [results[0].id]),
-            Ventes : results.reduce((acc, cur) => acc + cur.quantitat, 0),
-            Diners : results.reduce((acc, cur) => acc + cur.preu, 0),
-            Diners_venda : results.reduce((acc, cur) => acc + cur.quantitat, 0)/results.reduce((acc, cur) => acc + cur.preu, 0),
-            Moneda : "€"
+    /*fs.readFile('./TakeAway/comandas.json', 'utf8', (err, data) => {
+        if (err) {
+            console.err('Error al leer el archivo JSON');
+            return;
         }
-        json.comanda.push(novaComanda);
-        fs.writeFile('./TakeAway/comandas.json', JSON.stringify(json, null, 2), (error) => {
-            if(error) {
-                console.error('Ha ocurrido un error:', error);
-            } else {
-                console.log('Se ha añadido con exito');
-            }
-        });*/
+        json = JSON.parse(data);
+    });
+
+    const novaComanda = {
+        ID : results[0].id,
+        Clients : await connection.execute('SELECT NAME FROM usuari u JOIN comanda c WHERE u.ID = c.IDUSER WHERE c.IDUSER = ?', [results[0].id]),
+        Ventes : results.reduce((acc, cur) => acc + cur.quantitat, 0),
+        Diners : results.reduce((acc, cur) => acc + cur.preu, 0),
+        Diners_venda : results.reduce((acc, cur) => acc + cur.quantitat, 0)/results.reduce((acc, cur) => acc + cur.preu, 0),
+        Moneda : "€"
+    }
+    json.comanda.push(novaComanda);
+    fs.writeFile('./TakeAway/comandas.json', JSON.stringify(json, null, 2), (error) => {
+        if(error) {
+            console.error('Ha ocurrido un error:', error);
+        } else {
+            console.log('Se ha añadido con exito');
+        }
+    });*/
     res.json({ valid: true });
-        
+
   } catch (error) {
     res.json({ valid: false });
   } finally {

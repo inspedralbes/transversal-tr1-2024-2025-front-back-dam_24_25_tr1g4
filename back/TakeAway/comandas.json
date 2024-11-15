@@ -2,18 +2,186 @@
   "comandas": [
     {
       "ID": 1,
-      "Clients": "Carlos Martínez",
-      "Ventes": 6,
-      "Diners": 10,
+      "Clients": "uwuowo",
+      "Ventes": 9,
+      "Diners": 100,
+      "Diners_venda": "11.11",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 1,
+      "Clients": "uwuowo",
+      "Ventes": 3,
+      "Diners": 20,
+      "Diners_venda": "6.67",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 4,
+      "Clients": "Juan Pérez",
+      "Ventes": 8,
+      "Diners": 50,
+      "Diners_venda": "6.25",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 4,
+      "Clients": "Juan Pérez",
+      "Ventes": 30,
+      "Diners": 50,
       "Diners_venda": "1.67",
       "Moneda": "euro"
     },
     {
-      "ID": 2,
+      "ID": 4,
+      "Clients": "Juan Pérez",
+      "Ventes": 100,
+      "Diners": 200,
+      "Diners_venda": "2.00",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 3,
       "Clients": "Lucía González",
-      "Ventes": 8,
-      "Diners": 100,
+      "Ventes": 50,
+      "Diners": 240,
+      "Diners_venda": "4.80",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 2,
+      "Clients": "Carlos Martínez",
+      "Ventes": 72,
+      "Diners": 240,
+      "Diners_venda": "3.33",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 6,
+      "Clients": "Andrés Torres",
+      "Ventes": 90,
+      "Diners": 600,
+      "Diners_venda": "6.67",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 11,
+      "Clients": "Isabella Ruiz",
+      "Ventes": 40,
+      "Diners": 500,
       "Diners_venda": "12.50",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 14,
+      "Clients": "Javier Morales",
+      "Ventes": 70,
+      "Diners": 600,
+      "Diners_venda": "8.57",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 14,
+      "Clients": "Javier Morales",
+      "Ventes": 120,
+      "Diners": 751,
+      "Diners_venda": "6.26",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 20,
+      "Clients": "Martín Castro",
+      "Ventes": 80,
+      "Diners": 689,
+      "Diners_venda": "8.61",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 21,
+      "Clients": "Juliana Pineda",
+      "Ventes": 66,
+      "Diners": 574,
+      "Diners_venda": "8.70",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 18,
+      "Clients": "Ricardo Silva",
+      "Ventes": 66,
+      "Diners": 1230,
+      "Diners_venda": "18.64",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 21,
+      "Clients": "Juliana Pineda",
+      "Ventes": 108,
+      "Diners": 1400,
+      "Diners_venda": "12.96",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 10,
+      "Clients": "Luis Hernández",
+      "Ventes": 84,
+      "Diners": 400,
+      "Diners_venda": "4.76",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 10,
+      "Clients": "Luis Hernández",
+      "Ventes": 21,
+      "Diners": 852,
+      "Diners_venda": "40.57",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 2,
+      "Clients": "Carlos Martínez",
+      "Ventes": 5,
+      "Diners": 30,
+      "Diners_venda": "6.00",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 6,
+      "Clients": "Andrés Torres",
+      "Ventes": 50,
+      "Diners": 100,
+      "Diners_venda": "2.00",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 19,
+      "Clients": "Camila Vargas",
+      "Ventes": 600,
+      "Diners": 1000,
+      "Diners_venda": "1.67",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 4,
+      "Clients": "Juan Pérez",
+      "Ventes": 112,
+      "Diners": 560,
+      "Diners_venda": "5.00",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 4,
+      "Clients": "Juan Pérez",
+      "Ventes": 134,
+      "Diners": 628,
+      "Diners_venda": "4.69",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 4,
+      "Clients": "Juan Pérez",
+      "Ventes": 90,
+      "Diners": 600,
+      "Diners_venda": "6.67",
       "Moneda": "euro"
     }
   ]
