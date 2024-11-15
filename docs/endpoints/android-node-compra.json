@@ -2,11 +2,11 @@
     "idUsuari": 0,
     "productes": [
         {
-            "idProducte": "String",
+            "idProducte": 0,
             "quantitat": 3
         },
         {
-            "idProducte": "String",
+            "idProducte": 0,
             "quantitat": 3
         }
     ],

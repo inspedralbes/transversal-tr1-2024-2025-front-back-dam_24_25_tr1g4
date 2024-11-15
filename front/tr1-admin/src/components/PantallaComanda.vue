@@ -1,16 +1,23 @@
 <template>
-  <v-container>
+  <v-container class="mt-5">
+    <v-alert 
+    class="mb-5"
+    text="Els estats de les comandes funcionen d'aquesta manera; 0:Rebuda, 1:En preparació, 2:Preparada, 3:Recollida"
+    title="Estat de les comandes"
+    type="info"
+    variant="tonal"
+  ></v-alert>
 
     <v-row>
       <v-col cols="12" md="10" offset-md="1">
-        <v-card>
+        <v-card class="borde-tabla">
           <v-card-text>
             <div class="container-tabla">
-              <div class="tabla-titulo">Comandes</div>
+              <div class="tabla-titulo">COMANDES</div>
               <div class="tabla_apartados">ID</div>
-              <div class="tabla_apartados">Estat</div>
-              <div class="tabla_apartados">ID User</div>
-              <div class="tabla_apartados">Preu Total</div>
+              <div class="tabla_apartados">ESTAT</div>
+              <div class="tabla_apartados">ID USER</div>
+              <div class="tabla_apartados">PREU</div>
               <div class="tabla_apartados"></div>
 
               <div
@@ -37,7 +44,7 @@
         </v-card>
       </v-col>
     </v-row>
-  </v-container>
+  </v-container >
 </template>
 
 <script setup>
@@ -113,11 +120,14 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.borde-tabla {
+  box-shadow: 5px 5px 10px #333;
+}
 .container-tabla {
   width: 100%;
-  background-color: whitesmoke;
+  /* background-color: whitesmoke; */
   margin: auto;
-  box-shadow: 0 0 20px #333;
+  /* box-shadow: 0 0 20px #333; */
   gap: 1px;
 
   display: grid;
@@ -131,7 +141,7 @@ onUnmounted(() => {
   grid-column-start: 1;
   grid-column-end: 6;
 
-  background-color: #e0e0e0;
+  background-color: #ebebeb;
   color: black;
   display: flex;
   align-items: center;

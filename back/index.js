@@ -9,7 +9,8 @@ import http from "http";
 import { Server } from "socket.io";
 import multer from "multer";
 import path from "path";
-import * as fs from 'fs';
+import * as fs from "fs";
+
 
 dotenv.config();
 const app = express();
@@ -36,27 +37,29 @@ io.on("connection", (socket) => {
   });
 });
 
-  const socketSendComandes = async (io) => {
-    // select de la comanda
-    //despues actualiza todo el array de comandas,porque asi es mucho mas fácil
-    // io.emit
-    //hacer un console.log :eligiendo estado de la comanda
-    console.log("Eligiendo estado de la comanda");
-    try {
-        const connection = await connectToDatabase();
-        // const [comandaSeleccionada] = await connection.execute('SELECT ID as id, ESTAT as estat FROM comanda WHERE ID = ?;', [id]); 
-        const [comandes] = await connection.execute('SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;');
-        console.log(comandes[0]);
-        comandes.forEach(row => {
-            row.preu_total = parseFloat(row.preu_total).toFixed(2);
-            row.preu_total = parseFloat(row.preu_total);
-            // console.log(typeof row.preu_total);
-        });
-        io.emit('actualizarArrayComandes', JSON.stringify(comandes));
-        await connection.end();
-    } catch (error) {
-        console.error("Error al obtener el array de comandas:", error);
-    }
+const socketSendComandes = async (io) => {
+  // select de la comanda
+  //despues actualiza todo el array de comandas,porque asi es mucho mas fácil
+  // io.emit
+  //hacer un console.log :eligiendo estado de la comanda
+  console.log("Eligiendo estado de la comanda");
+  try {
+    const connection = await connectToDatabase();
+    // const [comandaSeleccionada] = await connection.execute('SELECT ID as id, ESTAT as estat FROM comanda WHERE ID = ?;', [id]);
+    const [comandes] = await connection.execute(
+      "SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;"
+    );
+    console.log(comandes[0]);
+    comandes.forEach((row) => {
+      row.preu_total = parseFloat(row.preu_total).toFixed(2);
+      row.preu_total = parseFloat(row.preu_total);
+      // console.log(typeof row.preu_total);
+    });
+    io.emit("actualizarArrayComandes", JSON.stringify(comandes));
+    await connection.end();
+  } catch (error) {
+    console.error("Error al obtener el array de comandas:", error);
+  }
 };
 async function actualizarProductos(io) {
   try {
@@ -247,7 +250,10 @@ app.delete("/producte/:id", async (req, res) => {
   try {
     connection = await connectToDatabase();
     const { id } = req.params;
-    const [rows] = await connection.execute("SELECT img FROM producte WHERE id = ?",[id]);
+    const [rows] = await connection.execute(
+      "SELECT img FROM producte WHERE id = ?",
+      [id]
+    );
     if (rows.length > 0) {
       const fotoRuta = rows[0].img;
       const filePath = `./public/${fotoRuta}`;
@@ -277,27 +283,29 @@ app.delete("/producte/:id", async (req, res) => {
 // CRUD COMANDA
 
 // READ
-app.get('/comanda', async (req, res) => {
-    let connection;
-    try {
-        connection = await connectToDatabase();
-        const [rows] = await connection.execute('SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;');
-        console.log(rows[0]);
+app.get("/comanda", async (req, res) => {
+  let connection;
+  try {
+    connection = await connectToDatabase();
+    const [rows] = await connection.execute(
+      "SELECT ID as id, ESTAT as estat, IDUSER as iduser, PREU_TOTAL as preu_total, PRODUCTES as productes FROM comanda;"
+    );
+    console.log(rows[0]);
 
-        rows.forEach(row => {
-            row.preu_total = parseFloat(row.preu_total).toFixed(2);
-            row.preu_total = parseFloat(row.preu_total);
-            // console.log(typeof row.preu_total);
-        });
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch comanda' });
-    } finally {
-        if (connection) {
-            await connection.end();
-            console.log('Database connection closed.');
-        }
+    rows.forEach((row) => {
+      row.preu_total = parseFloat(row.preu_total).toFixed(2);
+      row.preu_total = parseFloat(row.preu_total);
+      // console.log(typeof row.preu_total);
+    });
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch comanda" });
+  } finally {
+    if (connection) {
+      await connection.end();
+      console.log("Database connection closed.");
     }
+  }
 });
 
 //acabada
@@ -325,42 +333,79 @@ app.get('/comanda', async (req, res) => {
 //     }
 // });
 
-
-
-
 // CREATE
-app.post('/comanda', async (req, res) => {
-    let connection;
-    try {
-        connection = await connectToDatabase();
-        console.log("conexion realizada");
-        let { idUsuari, productes, preuTotal } = req.body;
-        console.log(req.body);
-        const preu_total = preuTotal;
-        const idUser = idUsuari;
-        productes = JSON.stringify(productes);
-        const estat = 0;
-        const { result, error } = await connection.execute('INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)', [idUser, productes, estat, preu_total]);
-        console.log("insert realizado correctamente en la bbdd");
+app.post("/comanda", async (req, res) => {
+  let connection;
+  try {
+    connection = await connectToDatabase();
+    console.log("conexion realizada");
+    let { idUsuari, productes, preuTotal } = req.body;
+    console.log(req.body);
+    const sumaCuantitats = productes.reduce((acc, cur) => acc + cur.quantitat, 0);
+    const preu_total = preuTotal;
+    const idUser = idUsuari;
+    const [rows] = await connection.execute('SELECT NAME FROM usuari WHERE ID = ?', [idUser]);
+    const clientNombre = rows[0]?.NAME;
+    productes = JSON.stringify(productes);
+    const estat = 0;
+    await Promise.all([
+      connection.execute(
+        "INSERT INTO comanda (idUser, productes, estat, preu_total) VALUES (?, ?, ?, ?)",
+        [idUser, productes, estat, preu_total]
+      ),
+      actualizarEstoc(JSON.parse(productes)),
+    ]);
 
-        res.json({ valid: true });
-    } catch (error) {
-        console.log(error);
-        res.json({ valid: false });
-    } finally {
-        if (connection) {
-            await connection.end();
-            console.log('Database connection closed.');
-        }
+    console.log("insert realizado correctamente en la bbdd");
+    let json;
+    const data = fs.readFileSync('./TakeAway/comandas.json', 'utf8', (err) => {
+      if (err) {
+        console.err('Error al leer el archivo JSON');
+        return;
+      }
+    });
+    console.log(data);
+    json = JSON.parse(data);
+    const novaComanda = {
+      ID: idUser,
+      Clients: clientNombre,
+      Ventes: sumaCuantitats,
+      Diners: preu_total,
+      Diners_venda: (preu_total / sumaCuantitats).toFixed(2),
+      Moneda: "euro"
     }
+    json.comandas.push(novaComanda);
+    fs.writeFile('./TakeAway/comandas.json', JSON.stringify(json, null, 2), (error) => {
+      if (error) {
+        console.error('Ha ocurrido un error:', error);
+      } else {
+        console.log('Se ha añadido con exito');
+      }
+    });
+    const compras = await fs.readFile('./TakeAway/comandas.json', 'utf8', (err) => {
+      if (err) {
+        console.err('Error al leer el archivo JSON');
+        return;
+      }
+    });
+    res.json({ valid: true });
+  } catch (error) {
+    console.log(error);
+    res.json({ valid: false });
+  } finally {
+    if (connection) {
+      await connection.end();
+      console.log("Database connection closed.");
+    }
+  }
 });
 
 //CREATE ANDOROID FUNCIONA
-app.post('/comandaAndroid', async (req, res) => {
-    let connection;
-    try {
-        connection = await connectToDatabase();
-        console.log("Conexión realizada");
+app.post("/comandaAndroid", async (req, res) => {
+  let connection;
+  try {
+    connection = await connectToDatabase();
+    console.log("Conexión realizada");
 
     const { productes } = req.body;
 
@@ -386,16 +431,40 @@ app.post('/comandaAndroid', async (req, res) => {
         };
       })
     );
-
-        res.json({ valid: true });
-    } catch (error) {
-        res.json({ valid: false });
-    } finally {
-        if (connection) {
-            await connection.end();
-            console.log('Database connection closed.');
+    /*fs.readFile('./TakeAway/comandas.json', 'utf8', (err, data) => {
+        if (err) {
+            console.err('Error al leer el archivo JSON');
+            return;
         }
+        json = JSON.parse(data);
+    });
+
+    const novaComanda = {
+        ID : results[0].id,
+        Clients : await connection.execute('SELECT NAME FROM usuari u JOIN comanda c WHERE u.ID = c.IDUSER WHERE c.IDUSER = ?', [results[0].id]),
+        Ventes : results.reduce((acc, cur) => acc + cur.quantitat, 0),
+        Diners : results.reduce((acc, cur) => acc + cur.preu, 0),
+        Diners_venda : results.reduce((acc, cur) => acc + cur.quantitat, 0)/results.reduce((acc, cur) => acc + cur.preu, 0),
+        Moneda : "€"
     }
+    json.comanda.push(novaComanda);
+    fs.writeFile('./TakeAway/comandas.json', JSON.stringify(json, null, 2), (error) => {
+        if(error) {
+            console.error('Ha ocurrido un error:', error);
+        } else {
+            console.log('Se ha añadido con exito');
+        }
+    });*/
+    res.json({ valid: true });
+
+  } catch (error) {
+    res.json({ valid: false });
+  } finally {
+    if (connection) {
+      await connection.end();
+      console.log("Database connection closed.");
+    }
+  }
 });
 
 // UPDATE VUE FUNCIONA
@@ -501,70 +570,71 @@ app.post("/users", async (req, res) => {
 
     const { name, password, pagament, correo } = req.body;
 
-        if (!name || !password || !pagament || !correo) {
-            return res.status(400).json({ error: `Todos los campos son obligatorios` });
-        }
-
-        const [checkExistingUser] = await connection.execute(
-            'SELECT * FROM usuari WHERE correo = ?', [correo]
-        );
-
-        if (checkExistingUser.length > 0) {
-            console.log("El usuario ya existe en la base de datos");
-            const token = "2";
-            return res.status(200).json({
-                valid: false,
-                usuari: {
-                    id: 0,
-                    nom: "none",
-                    email: "none",
-                    token
-                }
-            });
-        }
-        console.log("datos antes de hashear la contraseña: ", req.body);
-
-        const hashedPassword = bcrypt.hashSync(password, salt);
-
-        console.log(hashedPassword);
-
-        const [result] = await connection.execute(
-            'INSERT INTO usuari (name, password, pagament, correo) VALUES (?, ?, ?, ?)',
-            [name, hashedPassword, pagament, correo]
-        );
-        console.log("Inserción realizada correctamente en la base de datos");
-
-        // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL 
-        const token = "2";
-        return res.status(200).json({
-            valid: true,
-            usuari: {
-                id: result.insertId,
-                nom: name,
-                email: correo,
-                token
-            }
-        });
-
-
-    } catch (error) {
-        console.log(error);
-        const token = "2";
-        return res.status(200).json({
-            valid: false,
-            usuari: {
-                id: 0,
-                nom: "none",
-                email: "none",
-                token
-            }
-        });
-    } finally {
-        if (connection) {
-            await connection.end();
-            console.log('Conexión a la base de datos cerrada.');
-        }
+    if (!name || !password || !pagament || !correo) {
+      return res
+        .status(400)
+        .json({ error: `Todos los campos son obligatorios` });
     }
+
+    const [checkExistingUser] = await connection.execute(
+      "SELECT * FROM usuari WHERE correo = ?",
+      [correo]
+    );
+
+    if (checkExistingUser.length > 0) {
+      console.log("El usuario ya existe en la base de datos");
+      const token = "2";
+      return res.status(200).json({
+        valid: false,
+        usuari: {
+          id: 0,
+          nom: "none",
+          email: "none",
+          token,
+        },
+      });
+    }
+    console.log("datos antes de hashear la contraseña: ", req.body);
+
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
+    console.log(hashedPassword);
+
+    const [result] = await connection.execute(
+      "INSERT INTO usuari (name, password, pagament, correo) VALUES (?, ?, ?, ?)",
+      [name, hashedPassword, pagament, correo]
+    );
+    console.log("Inserción realizada correctamente en la base de datos");
+
+    // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL
+    const token = "2";
+    return res.status(200).json({
+      valid: true,
+      usuari: {
+        id: result.insertId,
+        nom: name,
+        email: correo,
+        token,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    const token = "2";
+    return res.status(200).json({
+      valid: false,
+      usuari: {
+        id: 0,
+        nom: "none",
+        email: "none",
+        token,
+      },
+    });
+  } finally {
+    if (connection) {
+      await connection.end();
+      console.log("Conexión a la base de datos cerrada.");
+    }
+  }
 });
 
 app.post("/login", async (req, res) => {
@@ -572,67 +642,89 @@ app.post("/login", async (req, res) => {
   try {
     connection = await connectToDatabase();
 
-        const { correu, contrasenya } = req.body;
-        console.log("req.body:  ", req.body);
+    const { correu, contrasenya } = req.body;
+    console.log("req.body:  ", req.body);
 
-        const [userResult] = await connection.execute(
-            'SELECT id, name, correo, password FROM usuari WHERE correo = ?', [correu]
-        );
+    const [userResult] = await connection.execute(
+      "SELECT id, name, correo, password FROM usuari WHERE correo = ?",
+      [correu]
+    );
 
-        if (userResult.length === 0) {
-            const token = "2";
-            return res.status(200).json({
-                valid: false,
-                usuari: {
-                    id: 0,
-                    nom: "none",
-                    email: "none",
-                    token
-                }
-            });
-        }
-
-        const usuari = userResult[0];
-        console.log("contra ingresada: ", contrasenya);
-
-        console.log("contrta bbdd: ", usuari.password); //contra bbdd
-        const passwordMatch = bcrypt.compareSync(contrasenya, usuari.password);
-        console.log(passwordMatch);
-
-        if (!passwordMatch) {
-            const token = "2";
-            return res.status(200).json({
-                valid: false,
-                usuari: {
-                    id: 0,
-                    nom: "none",
-                    email: "none",
-                    token
-                }
-            });
-        }
-        else if (passwordMatch) {
-            // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL 
-            const token = "2";
-            return res.status(200).json({
-                valid: true,
-                usuari: {
-                    id: usuari.id,
-                    nom: usuari.name,
-                    email: usuari.correo,
-                    token
-                }
-            });
-        }
-    } catch (error) {
-        res.status(500).json({ error: `Error en el login: ${error.message} ` });
-    } finally {
-        if (connection) {
-            await connection.end();
-            console.log('Database connection closed.');
-        }
+    if (userResult.length === 0) {
+      const token = "2";
+      return res.status(200).json({
+        valid: false,
+        usuari: {
+          id: 0,
+          nom: "none",
+          email: "none",
+          token,
+        },
+      });
     }
+
+    const usuari = userResult[0];
+    console.log("contra ingresada: ", contrasenya);
+
+    console.log("contrta bbdd: ", usuari.password); //contra bbdd
+    const passwordMatch = bcrypt.compareSync(contrasenya, usuari.password);
+    console.log(passwordMatch);
+
+    if (!passwordMatch) {
+      const token = "2";
+      return res.status(200).json({
+        valid: false,
+        usuari: {
+          id: 0,
+          nom: "none",
+          email: "none",
+          token,
+        },
+      });
+    } else if (passwordMatch) {
+      // const token = jwt.sign({ userId: usuari.id }, process.env.JWT_SECRET, { expiresIn: '1h' });  CUANDO SE HAGA EL TOKEN REAL
+      const token = "2";
+      return res.status(200).json({
+        valid: true,
+        usuari: {
+          id: usuari.id,
+          nom: usuari.name,
+          email: usuari.correo,
+          token,
+        },
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ error: `Error en el login: ${error.message} ` });
+  } finally {
+    if (connection) {
+      await connection.end();
+      console.log("Database connection closed.");
+    }
+  }
 });
+
+async function actualizarEstoc(productes) {
+  let connection;
+  try {
+    connection = await connectToDatabase();
+    for (const producte of productes) {
+      const { idProducte, quantitat } = producte;
+      await connection.execute(
+        "UPDATE producte SET estoc = estoc - ? WHERE id = ?",
+        [quantitat, idProducte]
+      );
+    }
+    console.log("Estoc actualitzat correctament");
+  } catch (error) {
+    console.error("Error al actualitzar l'estoc:", error);
+  } finally {
+    if (connection) {
+      await connection.end();
+      console.log("Database connection closed.");
+    }
+  }
+}
 
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

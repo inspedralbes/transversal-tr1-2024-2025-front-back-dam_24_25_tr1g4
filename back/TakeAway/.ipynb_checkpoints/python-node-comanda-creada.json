@@ -1,0 +1,12 @@
+{
+    "comanda" : [
+     {
+     "ID": 0,
+     "Clients": "String",
+     "Ventes": 0,
+     "Diners": 0,
+     "Diners_venda": 0,
+     "Moneda": "€"
+     }
+    ]
+}

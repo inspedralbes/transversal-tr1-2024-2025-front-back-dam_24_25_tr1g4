@@ -77,18 +77,18 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <v-container>
-    <v-row justify="start">
+  <v-container class="mb-5">
+    <v-row class="flex flex-col justify-center ma-5 ">
       <Anadir_Producto />
       <v-btn @click="openCreateDialog(producte)">Afegir Producte</v-btn>
     </v-row>
 
     <v-row>
       <v-col cols="12" md="10" offset-md="1">
-        <v-card>
+        <v-card class="borde-tabla">
           <v-card-text>
             <div class="container-tabla">
-              <div class="tabla-titulo">Productes</div>
+              <div class="tabla-titulo pt-3 pb-3">PRODUCTES</div>
               <div class="tabla_apartados">ID</div>
               <div class="tabla_apartados">NOM</div>
               <div class="tabla_apartados">IMG</div>
@@ -172,12 +172,16 @@ onBeforeMount(() => {
 </template>
 
 <style scoped>
+.borde-tabla {
+  box-shadow: 5px 5px 10px #333;
+}
+
 .container-tabla {
   width: 100%;
-  background-color: whitesmoke;
-  margin: auto;
-  box-shadow: 0 0 20px #333;
-  gap: 1px;
+  /* background-color: whitesmoke; */
+  /* margin: auto; */
+  /* box-shadow: 5px 5px 10px #333; */
+  gap: 20px;
 
   display: grid;
   grid-template-columns: 1fr 3fr 1.6fr 1fr 1fr 1fr 3fr;
@@ -189,7 +193,7 @@ onBeforeMount(() => {
   grid-column-start: 1;
   grid-column-end: 8;
 
-  background-color: #e0e0e0;
+  background-color: #ebebeb;
   color: black;
   display: flex;
   align-items: center;
