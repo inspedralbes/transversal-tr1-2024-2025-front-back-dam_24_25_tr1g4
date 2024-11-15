@@ -1,0 +1,20 @@
+{
+  "comandas": [
+    {
+      "ID": 1,
+      "Clients": "Carlos Martínez",
+      "Ventes": 6,
+      "Diners": 10,
+      "Diners_venda": "1.67",
+      "Moneda": "euro"
+    },
+    {
+      "ID": 2,
+      "Clients": "Lucía González",
+      "Ventes": 8,
+      "Diners": 100,
+      "Diners_venda": "12.50",
+      "Moneda": "euro"
+    }
+  ]
+}
